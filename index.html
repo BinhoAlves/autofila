@@ -622,19 +622,26 @@ async function criarUsuario(){
       if(ve)throw new Error('Erro ao criar vendedor: '+ve.message);
       vendedorId=vd.id;
     }
-    // 2. Criar usuário via SQL (evita erro de já registrado)
-    // Primeiro tenta signUp
-    const {data:auth,error:ae}=await db.auth.signUp({email,password:senha,options:{data:{nome}}});
+    // 2. Criar usuário
+    const {data:auth,error:ae}=await db.auth.signUp({
+      email,
+      password:senha,
+      options:{
+        data:{nome},
+        emailRedirectTo: window.location.origin
+      }
+    });
     let userId=null;
     if(ae){
-      // Se já existe, busca o ID existente
-      if(ae.message.includes('already registered')||ae.message.includes('already been registered')){
-        toast('E-mail já existe no sistema','tR');
-        // Reverter vendedor criado
-        if(vendedorId)await db.from('vendedores').update({ativo:false}).eq('id',vendedorId);
-        btn.disabled=false;btn.textContent='Criar';return;
-      }
-      throw new Error('Erro: '+ae.message);
+      toast('Erro: '+ae.message,'tR');
+      if(vendedorId)await db.from('vendedores').update({ativo:false}).eq('id',vendedorId);
+      btn.disabled=false;btn.textContent='Criar';return;
+    }
+    // Se identities vazio = email já existe
+    if(auth?.user?.identities?.length===0){
+      toast('E-mail já cadastrado no sistema','tR');
+      if(vendedorId)await db.from('vendedores').update({ativo:false}).eq('id',vendedorId);
+      btn.disabled=false;btn.textContent='Criar';return;
     }
     userId=auth?.user?.id;
     if(!userId)throw new Error('Usuário não criado');

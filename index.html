@@ -814,7 +814,10 @@ async function excluirHistorico(id, clienteNome){
 }
 
 async function excluirVendedor(id, nome){
-  confirmarExcluir('Remover vendedor "'+nome+'"? O acesso ao sistema também será removido. O histórico de atendimentos é mantido.', async()=>{
+  confirmarExcluir('Remover vendedor "'+nome+'"? O acesso, histórico de atendimentos e login serão removidos.', async()=>{
+    // Apagar histórico de atendimentos
+    await db.from('historico').delete().eq('vendedor_nome', nome);
+    await db.from('clientes').delete().eq('vendedor_nome', nome);
     // Desativar vendedor da fila
     await db.from('vendedores').update({ativo:false}).eq('id',id);
     // Buscar perfil vinculado e remover login
@@ -823,8 +826,9 @@ async function excluirVendedor(id, nome){
       await db.from('perfis').delete().eq('id',perfil.id);
       await db.rpc('delete_user',{user_id:perfil.id});
     }
-    toast(nome+' removido da equipe e do sistema','green');
+    toast(nome+' removido completamente','green');
     await loadVendedores();
+    await loadHistorico();
     await loadUsuarios();
   });
 }

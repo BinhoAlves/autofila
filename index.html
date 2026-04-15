@@ -994,6 +994,9 @@ async function sair(){
 
 // ── INICIAR SISTEMA ───────────────────────────────────────────────────────
 async function iniciarSistema(){
+  // Recarregar perfil fresco do banco sempre
+  const {data:perfilAtual}=await db.from('perfis').select('*').eq('id',PERFIL_ATUAL.id).single();
+  if(perfilAtual) PERFIL_ATUAL=perfilAtual;
   document.getElementById('tela-login').style.display='none';
   document.getElementById('sistema').style.display='block';
   document.getElementById('nav-user').textContent=PERFIL_ATUAL.nome+' ('+traduzPerfil(PERFIL_ATUAL.perfil)+')';

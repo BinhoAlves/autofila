@@ -7,28 +7,47 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#0d0f14;--bg2:#13161d;--bg3:#1a1e28;--bg4:#22273a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e8eaf0;--text2:#8b90a0;--text3:#555b70;--green:#00d67e;--green-bg:rgba(0,214,126,0.10);--green-dim:rgba(0,214,126,0.06);--amber:#f5a623;--amber-bg:rgba(245,166,35,0.10);--red:#ff4f6a;--red-bg:rgba(255,79,106,0.10);--blue:#4f9eff;--blue-bg:rgba(79,158,255,0.10);--purple:#9b7fff;--purple-bg:rgba(155,127,255,0.10);--radius:10px;--radius-lg:16px}
+:root{--bg:#0d0f14;--bg2:#13161d;--bg3:#1a1e28;--bg4:#22273a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e8eaf0;--text2:#8b90a0;--text3:#555b70;--green:#00d67e;--green-bg:rgba(0,214,126,0.10);--amber:#f5a623;--amber-bg:rgba(245,166,35,0.10);--red:#ff4f6a;--red-bg:rgba(255,79,106,0.10);--blue:#4f9eff;--blue-bg:rgba(79,158,255,0.10);--purple:#9b7fff;--purple-bg:rgba(155,127,255,0.10);--radius:10px;--radius-lg:16px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
-.nav{display:flex;align-items:center;gap:0;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
-.nav-logo{font-weight:600;font-size:15px;color:var(--text);padding:16px 24px 16px 0;border-right:1px solid var(--border);margin-right:8px;white-space:nowrap}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:40px;width:100%;max-width:400px}
+.login-logo{font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px}
+.login-logo span{color:var(--green)}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:32px}
+.login-err{background:var(--red-bg);border:1px solid rgba(255,79,106,0.2);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:16px;display:none}
+
+/* NAV */
+.nav{display:flex;align-items:center;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100}
+.nav-logo{font-weight:600;font-size:15px;color:var(--text);padding:16px 20px 16px 0;border-right:1px solid var(--border);margin-right:8px;white-space:nowrap}
 .nav-logo span{color:var(--green)}
-.nav-tab{padding:18px 16px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.nav-tab{padding:18px 14px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
 .nav-tab:hover{color:var(--text)}
 .nav-tab.active{color:var(--green);border-bottom:2px solid var(--green)}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.nav-user{font-size:12px;color:var(--text3)}
 .nav-clock{font-family:'DM Mono',monospace;font-size:13px;color:var(--text3)}
 .online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* PAGES */
 .page{display:none;padding:24px;max-width:1200px;margin:0 auto}
 .page.active{display:block}
+
+/* CARDS */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
-.card-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.card-hdr h3{font-size:13px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
+.card-hdr{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-hdr h3{font-size:12px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
 .card-body{padding:20px}
+
+/* GRID */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 @media(max-width:768px){.grid2,.grid4{grid-template-columns:1fr}}
+
+/* BADGES */
 .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
 .badge-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .b-green{background:var(--green-bg);color:var(--green)}.b-green .badge-dot{background:var(--green)}
@@ -37,19 +56,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .b-blue{background:var(--blue-bg);color:var(--blue)}.b-blue .badge-dot{background:var(--blue)}
 .b-purple{background:var(--purple-bg);color:var(--purple)}.b-purple .badge-dot{background:var(--purple)}
 .b-gray{background:rgba(139,144,160,0.10);color:var(--text2)}.b-gray .badge-dot{background:var(--text3)}
+
+/* BUTTONS */
 .btn{padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text);transition:all .15s;font-family:'DM Sans',sans-serif}
 .btn:hover{background:var(--bg4)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-primary{background:var(--green);color:#000;border-color:var(--green)}
 .btn-primary:hover{background:#00f090}
 .btn-sm{padding:5px 12px;font-size:12px}
+.btn-danger{background:var(--red-bg);color:var(--red);border-color:rgba(255,79,106,0.2)}
+.btn-danger:hover{background:rgba(255,79,106,0.2)}
+
+/* FORMS */
 .form-group{margin-bottom:16px}
 .form-label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
 .form-input,.form-select{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;transition:border .15s}
 .form-input:focus,.form-select:focus{outline:none;border-color:var(--green)}
 .form-select option{background:var(--bg3)}
+
+/* METRICS */
 .metric{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
-.metric-val{font-size:28px;font-weight:600;color:var(--text)}
+.metric-val{font-size:28px;font-weight:600}
 .metric-lbl{font-size:12px;color:var(--text2);margin-top:4px}
+
+/* AVATAR */
 .avatar{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
 .av-green{background:var(--green-bg);color:var(--green)}
 .av-amber{background:var(--amber-bg);color:var(--amber)}
@@ -57,25 +87,48 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .av-red{background:var(--red-bg);color:var(--red)}
 .av-gray{background:rgba(139,144,160,0.10);color:var(--text2)}
 .av-purple{background:var(--purple-bg);color:var(--purple)}
+
+/* TABLE */
 .tbl{width:100%;border-collapse:collapse}
 .tbl th{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-.tbl td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.tbl td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:rgba(255,255,255,0.02)}
+.tbl tr:hover td{background:rgba(255,255,255,0.015)}
 .tbl tr.row-next td{background:rgba(0,214,126,0.04)}
+
+/* POS BADGE */
 .pos-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
 .pos-1{background:var(--green-bg);color:var(--green)}
 .pos-2{background:var(--amber-bg);color:var(--amber)}
 .pos-3{background:var(--blue-bg);color:var(--blue)}
 .pos-n{background:var(--bg4);color:var(--text3)}
+
+/* SECTION TITLE */
 .section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px}
 .text-sm{font-size:12px;color:var(--text2)}
 .loading{text-align:center;padding:32px;color:var(--text3);font-size:13px}
+
+/* VENDEDOR MOBILE */
+.vend-mobile{max-width:480px;margin:0 auto}
+.vend-card-cliente{background:linear-gradient(135deg,rgba(0,214,126,0.12),rgba(0,214,126,0.04));border:1px solid rgba(0,214,126,0.2);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px}
+.vend-card-cliente h2{font-size:20px;font-weight:600;margin-bottom:4px}
+.vend-card-cliente .interesse{font-size:13px;color:var(--text2);margin-bottom:12px}
+.vend-card-cliente .tel{font-size:14px;color:var(--green)}
+.vend-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.vend-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
+.vend-stat-n{font-size:24px;font-weight:600}
+.vend-stat-l{font-size:11px;color:var(--text2);margin-top:2px}
+.status-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.sbtn{padding:10px 8px;border-radius:var(--radius);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .15s;font-family:'DM Sans',sans-serif;text-align:center}
+.sbtn.active-green{background:var(--green-bg);color:var(--green);border-color:rgba(0,214,126,0.3)}
+.sbtn.active-amber{background:var(--amber-bg);color:var(--amber);border-color:rgba(245,166,35,0.3)}
+.sbtn.active-gray{background:rgba(139,144,160,0.1);color:var(--text2);border-color:rgba(139,144,160,0.2)}
+
 /* TV */
 .tv-screen{background:#070a0f;min-height:100vh}
 .tv-header{background:#0d1117;border-bottom:1px solid rgba(255,255,255,0.05);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
 .tv-logo{font-size:16px;font-weight:600;color:#fff}.tv-logo span{color:var(--green)}
-.tv-body{padding:24px 32px;display:grid;grid-template-columns:1fr 340px;gap:24px;height:calc(100vh - 57px)}
+.tv-body{padding:24px 32px;display:grid;grid-template-columns:1fr 320px;gap:24px;height:calc(100vh - 57px)}
 .tv-left,.tv-right{display:flex;flex-direction:column;gap:20px}
 .tv-now{background:linear-gradient(135deg,rgba(0,214,126,0.12),rgba(0,214,126,0.04));border:1px solid rgba(0,214,126,0.2);border-radius:20px;padding:28px 32px;display:flex;align-items:center;gap:24px}
 .tv-now-num{width:72px;height:72px;border-radius:16px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#000;flex-shrink:0;font-family:'DM Mono',monospace}
@@ -86,29 +139,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .tv-queue-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:14px;overflow:hidden}
 .tv-queue-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.04)}
 .tv-queue-row:last-child{border-bottom:none}
-.tv-queue-num{font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.2);width:32px}
-.tv-queue-name{flex:1;font-size:16px;color:rgba(255,255,255,0.8)}
-.tv-queue-seller{font-size:13px;color:rgba(255,255,255,0.35)}
+.tv-queue-num{font-size:13px;color:rgba(255,255,255,0.2);width:24px}
+.tv-queue-name{flex:1;font-size:15px;color:rgba(255,255,255,0.8)}
+.tv-queue-seller{font-size:12px;color:rgba(255,255,255,0.35)}
 .tv-queue-st{font-size:11px;padding:3px 10px;border-radius:6px}
-.st-wait{background:rgba(245,166,35,0.12);color:#f5a623}
 .st-next{background:rgba(0,214,126,0.12);color:#00d67e}
+.st-wait{background:rgba(245,166,35,0.12);color:#f5a623}
 .tv-team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.tv-seller-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:12px 14px}
-.tv-seller-card.free{border-color:rgba(0,214,126,0.15)}
-.tv-seller-card.busy{border-color:rgba(245,166,35,0.15)}
-.tv-seller-name{font-size:12px;color:rgba(255,255,255,0.6);font-weight:500}
-.tv-seller-num{font-size:22px;font-weight:600;color:#fff}
-.tv-seller-st{font-size:10px;margin-top:2px}
+.tv-sc{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:10px 12px}
+.tv-sc.free{border-color:rgba(0,214,126,0.15)}
+.tv-sc.busy{border-color:rgba(245,166,35,0.15)}
+.tv-sc-num{font-size:20px;font-weight:600;color:#fff}
+.tv-sc-name{font-size:11px;color:rgba(255,255,255,0.6);font-weight:500}
+.tv-sc-st{font-size:10px;margin-top:1px}
 .tv-empty{background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.08);border-radius:20px;padding:40px;text-align:center;color:rgba(255,255,255,0.2);font-size:15px}
-/* Modal */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
 .modal h3{font-size:16px;font-weight:600;margin-bottom:20px}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
-/* Toast */
+
+/* TOAST */
 .toast-wrap{position:fixed;top:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:999}
-.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 16px;font-size:13px;color:var(--text);max-width:320px;animation:slideIn .25s ease;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:12px 16px;font-size:13px;color:var(--text);max-width:300px;animation:slideIn .25s ease;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 .toast.t-green{border-left:3px solid var(--green)}
 .toast.t-amber{border-left:3px solid var(--amber)}
 .toast.t-red{border-left:3px solid var(--red)}
@@ -119,171 +174,192 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 
-<nav class="nav" id="main-nav">
-  <div class="nav-logo">Auto<span>Fila</span></div>
-  <button class="nav-tab active" onclick="goPage('recepcao',this)">Recepção</button>
-  <button class="nav-tab" onclick="goPage('vendedores',this)">Vendedores</button>
-  <button class="nav-tab" onclick="goPage('gestao',this)">Gestão</button>
-  <button class="nav-tab" onclick="goPage('tv',this)">TV da Sala</button>
-  <div class="nav-right">
-    <div class="online-dot"></div>
-    <span class="nav-clock" id="nav-clock">--:--</span>
-  </div>
-</nav>
-
-<div class="toast-wrap" id="toast-wrap"></div>
-
-<!-- RECEPÇÃO -->
-<div class="page active" id="page-recepcao">
-  <div class="grid2" style="gap:24px;align-items:start">
-    <div>
-      <div class="card">
-        <div class="card-hdr">
-          <h3>Novo cliente</h3>
-          <span class="badge b-green"><span class="badge-dot"></span>Sistema ativo</span>
-        </div>
-        <div class="card-body">
-          <div class="form-group">
-            <label class="form-label">Nome do cliente</label>
-            <input class="form-input" type="text" id="f-nome" placeholder="Ex: João da Silva">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Telefone</label>
-            <input class="form-input" type="text" id="f-tel" placeholder="(11) 99999-9999">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Interesse</label>
-            <select class="form-select" id="f-interesse">
-              <option>Compra — novo</option>
-              <option>Compra — seminovo</option>
-              <option>Avaliação de troca</option>
-              <option>Financiamento</option>
-              <option>Revisão / pós-venda</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Observação (opcional)</label>
-            <input class="form-input" type="text" id="f-obs" placeholder="Ex: veio indicado por cliente">
-          </div>
-          <button class="btn btn-primary" style="width:100%;padding:12px" onclick="registrarCliente()">Registrar e distribuir na fila</button>
-          <div id="rec-feedback" style="display:none;margin-top:14px;padding:16px;background:var(--green-bg);border:1px solid rgba(0,214,126,0.2);border-radius:var(--radius)">
-            <div style="font-size:12px;color:var(--green);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Cliente distribuído</div>
-            <div style="font-size:16px;font-weight:600" id="rec-nome-cli">—</div>
-            <div style="font-size:13px;color:var(--text2);margin-top:2px">Vendedor: <strong id="rec-vendedor" style="color:var(--text)">—</strong></div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px" id="rec-criterio"></div>
-          </div>
-        </div>
-      </div>
+<!-- ── TELA DE LOGIN ── -->
+<div id="tela-login" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">Auto<span>Fila</span></div>
+    <div class="login-sub">Sistema de Atendimento — Loja de Carros</div>
+    <div class="login-err" id="login-err"></div>
+    <div class="form-group">
+      <label class="form-label">E-mail</label>
+      <input class="form-input" type="email" id="login-email" placeholder="seu@email.com">
     </div>
-    <div style="display:flex;flex-direction:column;gap:16px">
-      <div class="card">
-        <div class="card-hdr">
-          <h3>Próximos da fila</h3>
-          <span class="text-sm" id="fila-count">—</span>
-        </div>
-        <div id="fila-lista"><div class="loading">Conectando ao banco...</div></div>
-      </div>
-      <div class="card">
-        <div class="card-hdr">
-          <h3>Status da equipe</h3>
-          <button class="btn btn-sm" onclick="openModalStatus(null)">Alterar status</button>
-        </div>
-        <div style="padding:16px;display:flex;flex-direction:column;gap:8px" id="equipe-resumo"></div>
-      </div>
+    <div class="form-group">
+      <label class="form-label">Senha</label>
+      <input class="form-input" type="password" id="login-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()">
     </div>
+    <button class="btn btn-primary" style="width:100%;padding:12px" id="btn-login" onclick="fazerLogin()">Entrar</button>
   </div>
 </div>
 
-<!-- VENDEDORES -->
-<div class="page" id="page-vendedores">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-    <div>
-      <div class="section-title">Equipe de vendas</div>
-      <div style="font-size:20px;font-weight:600" id="v-count-title">—</div>
-    </div>
-    <button class="btn btn-primary" onclick="openModalVendedor(null)">+ Novo vendedor</button>
-  </div>
-  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="filtros-vend">
-    <button class="btn btn-sm" id="f-todos" onclick="setFiltro('todos',this)">Todos</button>
-    <button class="btn btn-sm" id="f-disponivel" onclick="setFiltro('disponivel',this)">Disponível</button>
-    <button class="btn btn-sm" id="f-atendendo" onclick="setFiltro('atendendo',this)">Atendendo</button>
-    <button class="btn btn-sm" id="f-indisponivel" onclick="setFiltro('indisponivel',this)">Indisponível</button>
-    <button class="btn btn-sm" id="f-ferias" onclick="setFiltro('ferias',this)">Férias</button>
-  </div>
-  <div style="padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">Ordem da fila:</span>
-    <div id="fila-strip" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-  </div>
-  <div class="card">
-    <table class="tbl">
-      <thead><tr>
-        <th>Pos.</th><th>Vendedor</th><th>Status</th>
-        <th>Último atend.</th><th>Hoje</th><th>Virtuais</th><th>Efetivo</th><th>Ações</th>
-      </tr></thead>
-      <tbody id="tbody-v"><tr><td colspan="8" class="loading">Carregando...</td></tr></tbody>
-    </table>
-  </div>
-</div>
+<!-- ── SISTEMA PRINCIPAL ── -->
+<div id="sistema" style="display:none">
 
-<!-- GESTÃO -->
-<div class="page" id="page-gestao">
-  <div class="section-title" style="margin-bottom:16px">Resumo do dia</div>
-  <div class="grid4" style="margin-bottom:24px">
-    <div class="metric"><div class="metric-val" id="g-total">—</div><div class="metric-lbl">Clientes atendidos</div></div>
-    <div class="metric"><div class="metric-val" id="g-disp">—</div><div class="metric-lbl">Disponíveis agora</div></div>
-    <div class="metric"><div class="metric-val" id="g-atend">—</div><div class="metric-lbl">Em atendimento</div></div>
-    <div class="metric"><div class="metric-val" id="g-indisp">—</div><div class="metric-lbl">Indispon. / férias</div></div>
+  <nav class="nav" id="main-nav">
+    <div class="nav-logo">Auto<span>Fila</span></div>
+    <div id="nav-tabs"></div>
+    <div class="nav-right">
+      <span class="nav-user" id="nav-user"></span>
+      <div class="online-dot"></div>
+      <span class="nav-clock" id="nav-clock">--:--</span>
+      <button class="btn btn-sm" onclick="sair()">Sair</button>
+    </div>
+  </nav>
+
+  <div class="toast-wrap" id="toast-wrap"></div>
+
+  <!-- RECEPÇÃO / ADMIN -->
+  <div class="page" id="page-recepcao">
+    <div class="grid2" style="gap:24px;align-items:start">
+      <div>
+        <div class="card">
+          <div class="card-hdr"><h3>Novo cliente</h3><span class="badge b-green"><span class="badge-dot"></span>Sistema ativo</span></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Nome do cliente</label><input class="form-input" type="text" id="f-nome" placeholder="Ex: João da Silva"></div>
+            <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="text" id="f-tel" placeholder="(11) 99999-9999"></div>
+            <div class="form-group">
+              <label class="form-label">Interesse</label>
+              <select class="form-select" id="f-interesse">
+                <option>Compra — novo</option><option>Compra — seminovo</option>
+                <option>Avaliação de troca</option><option>Financiamento</option><option>Revisão / pós-venda</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Observação (opcional)</label><input class="form-input" type="text" id="f-obs" placeholder="Ex: veio indicado por cliente"></div>
+            <button class="btn btn-primary" style="width:100%;padding:12px" id="btn-registrar" onclick="registrarCliente()">Registrar e distribuir na fila</button>
+            <div id="rec-feedback" style="display:none;margin-top:14px;padding:16px;background:var(--green-bg);border:1px solid rgba(0,214,126,0.2);border-radius:var(--radius)">
+              <div style="font-size:12px;color:var(--green);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Cliente distribuído</div>
+              <div style="font-size:16px;font-weight:600" id="rec-nome-cli">—</div>
+              <div style="font-size:13px;color:var(--text2);margin-top:2px">Vendedor: <strong id="rec-vendedor" style="color:var(--text)">—</strong></div>
+              <div style="font-size:11px;color:var(--text3);margin-top:4px" id="rec-criterio"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div class="card-hdr"><h3>Próximos da fila</h3><span class="text-sm" id="fila-count">—</span></div>
+          <div id="fila-lista"><div class="loading">Carregando...</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><h3>Status da equipe</h3><button class="btn btn-sm" onclick="openModalStatus(null)">Alterar status</button></div>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:8px" id="equipe-resumo"></div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="grid2" style="gap:20px;align-items:start">
-    <div class="card">
-      <div class="card-hdr"><h3>Ranking do dia</h3></div>
-      <table class="tbl"><thead><tr><th>#</th><th>Vendedor</th><th>Atendimentos</th><th>Status</th></tr></thead>
-      <tbody id="tbody-rank"><tr><td colspan="4" class="loading">Carregando...</td></tr></tbody></table>
+
+  <!-- VENDEDORES -->
+  <div class="page" id="page-vendedores">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div><div class="section-title">Equipe de vendas</div><div style="font-size:20px;font-weight:600" id="v-count-title">—</div></div>
+      <button class="btn btn-primary" onclick="openModalVendedor(null)">+ Novo vendedor</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="filtros-vend">
+      <button class="btn btn-sm" id="f-todos" onclick="setFiltro('todos',this)">Todos</button>
+      <button class="btn btn-sm" id="f-disponivel" onclick="setFiltro('disponivel',this)">Disponível</button>
+      <button class="btn btn-sm" id="f-atendendo" onclick="setFiltro('atendendo',this)">Atendendo</button>
+      <button class="btn btn-sm" id="f-indisponivel" onclick="setFiltro('indisponivel',this)">Indisponível</button>
+      <button class="btn btn-sm" id="f-ferias" onclick="setFiltro('ferias',this)">Férias</button>
+    </div>
+    <div style="padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">Ordem da fila:</span>
+      <div id="fila-strip" style="display:flex;gap:6px;flex-wrap:wrap"></div>
     </div>
     <div class="card">
-      <div class="card-hdr"><h3>Histórico de distribuições</h3><span class="text-sm" id="hist-count"></span></div>
-      <div id="hist-body" style="max-height:380px;overflow-y:auto"><div class="loading">Carregando...</div></div>
+      <table class="tbl">
+        <thead><tr><th>Pos.</th><th>Vendedor</th><th>Status</th><th>Último atend.</th><th>Hoje</th><th>Virtuais</th><th>Efetivo</th><th>Ações</th></tr></thead>
+        <tbody id="tbody-v"><tr><td colspan="8" class="loading">Carregando...</td></tr></tbody>
+      </table>
     </div>
   </div>
-</div>
 
-<!-- TV -->
-<div class="page" id="page-tv">
-  <div class="tv-screen">
-    <div class="tv-header">
-      <div class="tv-logo">Auto<span>Fila</span><span style="font-size:12px;color:rgba(255,255,255,0.2);font-weight:400;margin-left:10px">Sistema de Atendimento</span></div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="display:flex;align-items:center;gap:6px"><div class="online-dot"></div><span style="font-size:11px;color:rgba(255,255,255,0.3)">Ao vivo</span></div>
-        <div style="font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,0.35)" id="tv-clock">--:--:--</div>
-      </div>
+  <!-- GESTÃO -->
+  <div class="page" id="page-gestao">
+    <div class="section-title" style="margin-bottom:16px">Resumo do dia</div>
+    <div class="grid4" style="margin-bottom:24px">
+      <div class="metric"><div class="metric-val" id="g-total">—</div><div class="metric-lbl">Clientes atendidos</div></div>
+      <div class="metric"><div class="metric-val" id="g-disp">—</div><div class="metric-lbl">Disponíveis agora</div></div>
+      <div class="metric"><div class="metric-val" id="g-atend">—</div><div class="metric-lbl">Em atendimento</div></div>
+      <div class="metric"><div class="metric-val" id="g-indisp">—</div><div class="metric-lbl">Indispon. / férias</div></div>
     </div>
-    <div class="tv-body">
-      <div class="tv-left">
-        <div><div class="tv-sec-label">Em atendimento agora</div><div id="tv-now"></div></div>
-        <div><div class="tv-sec-label">Próximos da fila</div><div class="tv-queue-card" id="tv-queue"></div></div>
+    <div class="grid2" style="gap:20px;align-items:start">
+      <div class="card">
+        <div class="card-hdr"><h3>Ranking do dia</h3></div>
+        <table class="tbl"><thead><tr><th>#</th><th>Vendedor</th><th>Atendimentos</th><th>Status</th></tr></thead>
+        <tbody id="tbody-rank"></tbody></table>
       </div>
-      <div class="tv-right">
-        <div><div class="tv-sec-label">Equipe hoje</div><div class="tv-team-grid" id="tv-team"></div></div>
+      <div class="card">
+        <div class="card-hdr"><h3>Histórico</h3><span class="text-sm" id="hist-count"></span></div>
+        <div id="hist-body" style="max-height:380px;overflow-y:auto"></div>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- USUÁRIOS (só admin) -->
+  <div class="page" id="page-usuarios">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div><div class="section-title">Controle de acesso</div><div style="font-size:20px;font-weight:600">Usuários do sistema</div></div>
+      <button class="btn btn-primary" onclick="openModalNovoUsuario()">+ Novo usuário</button>
+    </div>
+    <div class="card">
+      <table class="tbl">
+        <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Vendedor vinculado</th><th>Ações</th></tr></thead>
+        <tbody id="tbody-usuarios"><tr><td colspan="5" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TELA DO VENDEDOR -->
+  <div class="page" id="page-vendedor-mobile">
+    <div class="vend-mobile">
+      <div id="vend-cliente-card"></div>
+      <div class="vend-stats" id="vend-stats"></div>
+      <div class="section-title">Meu status</div>
+      <div class="status-btns">
+        <button class="sbtn" id="sbtn-disp" onclick="mudarStatusVendedor('disponivel')">Disponível</button>
+        <button class="sbtn" id="sbtn-atend" onclick="mudarStatusVendedor('atendendo')">Atendendo</button>
+        <button class="sbtn" id="sbtn-indisp" onclick="mudarStatusVendedor('indisponivel')">Indisponível</button>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><h3>Minha fila do dia</h3></div>
+        <div id="vend-historico-lista"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TV -->
+  <div class="page" id="page-tv">
+    <div class="tv-screen">
+      <div class="tv-header">
+        <div class="tv-logo">Auto<span>Fila</span><span style="font-size:12px;color:rgba(255,255,255,0.2);font-weight:400;margin-left:10px">Sistema de Atendimento</span></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="display:flex;align-items:center;gap:6px"><div class="online-dot"></div><span style="font-size:11px;color:rgba(255,255,255,0.3)">Ao vivo</span></div>
+          <div style="font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,0.35)" id="tv-clock">--:--:--</div>
+        </div>
+      </div>
+      <div class="tv-body">
+        <div class="tv-left">
+          <div><div class="tv-sec-label">Em atendimento agora</div><div id="tv-now"></div></div>
+          <div><div class="tv-sec-label">Próximos da fila</div><div class="tv-queue-card" id="tv-queue"></div></div>
+        </div>
+        <div class="tv-right">
+          <div><div class="tv-sec-label">Equipe hoje</div><div class="tv-team-grid" id="tv-team"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- fim #sistema -->
 
 <!-- MODAL STATUS -->
 <div class="modal-overlay" id="modal-status">
   <div class="modal">
     <h3>Alterar status</h3>
-    <div class="form-group">
-      <label class="form-label">Vendedor</label>
-      <select class="form-select" id="ms-vend"></select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Novo status</label>
+    <div class="form-group"><label class="form-label">Vendedor</label><select class="form-select" id="ms-vend"></select></div>
+    <div class="form-group"><label class="form-label">Novo status</label>
       <select class="form-select" id="ms-status">
-        <option value="disponivel">Disponível</option>
-        <option value="atendendo">Atendendo</option>
-        <option value="indisponivel">Indisponível</option>
-        <option value="ferias">Férias / Afastado</option>
+        <option value="disponivel">Disponível</option><option value="atendendo">Atendendo</option>
+        <option value="indisponivel">Indisponível</option><option value="ferias">Férias / Afastado</option>
       </select>
     </div>
     <div class="modal-footer">
@@ -298,9 +374,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="modal">
     <h3 id="mv-titulo">Novo vendedor</h3>
     <input type="hidden" id="mv-id">
-    <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" id="mv-nome" placeholder="Ex: Carlos Mendes"></div>
-    <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="text" id="mv-tel" placeholder="(11) 99999-9999"></div>
-    <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="mv-email" placeholder="nome@loja.com.br"></div>
+    <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" id="mv-nome"></div>
+    <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="text" id="mv-tel"></div>
+    <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="mv-email"></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-vendedor')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarVendedor()">Salvar</button>
@@ -308,8 +384,45 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
+<!-- MODAL NOVO USUÁRIO -->
+<div class="modal-overlay" id="modal-usuario">
+  <div class="modal">
+    <h3>Novo usuário</h3>
+    <div class="form-group"><label class="form-label">Nome</label><input class="form-input" type="text" id="mu-nome" placeholder="Ex: Maria Recepcionista"></div>
+    <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="mu-email" placeholder="email@loja.com"></div>
+    <div class="form-group"><label class="form-label">Senha inicial</label><input class="form-input" type="text" id="mu-senha" placeholder="Mínimo 6 caracteres"></div>
+    <div class="form-group">
+      <label class="form-label">Perfil</label>
+      <select class="form-select" id="mu-perfil" onchange="toggleVendedorSelect()">
+        <option value="recepcao">Recepcionista</option>
+        <option value="vendedor">Vendedor</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </div>
+    <div class="form-group" id="mu-vend-grupo">
+      <label class="form-label">Vincular ao vendedor</label>
+      <select class="form-select" id="mu-vendedor-id"></select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-usuario')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-criar-usuario" onclick="criarUsuario()">Criar usuário</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR EXCLUSÃO -->
+<div class="modal-overlay" id="modal-excluir">
+  <div class="modal">
+    <h3>Confirmar exclusão</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:20px" id="excluir-msg">Tem certeza que deseja excluir este registro?</p>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-excluir')">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirmar-excluir">Excluir</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// ── SUPABASE ──────────────────────────────────────────────────────────────
 const { createClient } = supabase;
 const db = createClient(
   'https://vopgulrbstnguprdizjg.supabase.co',
@@ -317,80 +430,160 @@ const db = createClient(
 );
 
 // ── CONSTANTES ────────────────────────────────────────────────────────────
-const SB = {disponivel:'b-green',atendendo:'b-amber',indisponivel:'b-gray',ferias:'b-red'};
-const SL = {disponivel:'Disponível',atendendo:'Atendendo',indisponivel:'Indisponível',ferias:'Férias'};
-const AVC = ['av-green','av-blue','av-amber','av-purple','av-red'];
-const avc = i => AVC[i % AVC.length];
+const SB={disponivel:'b-green',atendendo:'b-amber',indisponivel:'b-gray',ferias:'b-red'};
+const SL={disponivel:'Disponível',atendendo:'Atendendo',indisponivel:'Indisponível',ferias:'Férias'};
+const AVC=['av-green','av-blue','av-amber','av-purple','av-red'];
+const avc=i=>AVC[i%AVC.length];
 
 // ── ESTADO ────────────────────────────────────────────────────────────────
-let VS = [];   // vendedores
-let HS = [];   // historico
-let filtro = 'todos';
+let VS=[], HS=[], USUARIOS=[];
+let filtro='todos';
+let PERFIL_ATUAL=null; // {id, email, nome, perfil, vendedor_id}
+let VENDEDOR_ATUAL=null; // dados do vendedor logado
 
 // ── UTILS ─────────────────────────────────────────────────────────────────
-const ini  = n => { const p=n.trim().split(' '); return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase(); };
-const fmtH = d => new Date(d).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-function ago(d) {
+const ini=n=>{const p=n.trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();};
+const fmtH=d=>new Date(d).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+function ago(d){
   const m=Math.floor((Date.now()-new Date(d))/60000);
-  if(m<1) return 'Agora';
-  if(m<60) return m+'min atrás';
-  const h=Math.floor(m/60); return h+'h'+(m%60>0?m%60+'min':'')+ ' atrás';
+  if(m<1)return 'Agora';if(m<60)return m+'min atrás';
+  const h=Math.floor(m/60);return h+'h'+(m%60>0?m%60+'min':'')+ ' atrás';
 }
 
-// ── LÓGICA DE FILA ────────────────────────────────────────────────────────
-function ordem() {
+// ── LÓGICA DA FILA ────────────────────────────────────────────────────────
+function calcOrdem(){
   return VS.filter(v=>v.status==='disponivel'&&v.ativo).sort((a,b)=>{
     const d=new Date(a.ultimo_atend)-new Date(b.ultimo_atend);
-    if(d!==0) return d;
-    const ta=a.atend_hoje+a.virtual, tb=b.atend_hoje+b.virtual;
-    if(ta!==tb) return ta-tb;
+    if(d!==0)return d;
+    const ta=a.atend_hoje+a.virtual,tb=b.atend_hoje+b.virtual;
+    if(ta!==tb)return ta-tb;
     return new Date(a.entrou_as)-new Date(b.entrou_as);
   });
 }
-
-function crit(v,rank,ord) {
-  if(rank===0||!ord[rank-1]) return 'Critério 1 — mais tempo sem atender';
+function critUsado(v,rank,ord){
+  if(rank===0||!ord[rank-1])return 'Critério 1 — mais tempo sem atender';
   const p=ord[rank-1];
-  if(new Date(p.ultimo_atend)<new Date(v.ultimo_atend)) return 'Critério 1 — atendeu mais recente';
-  if((p.atend_hoje+p.virtual)<(v.atend_hoje+v.virtual)) return 'Critério 2 — mais atend. efetivos';
+  if(new Date(p.ultimo_atend)<new Date(v.ultimo_atend))return 'Critério 1 — atendeu mais recente';
+  if((p.atend_hoje+p.virtual)<(v.atend_hoje+v.virtual))return 'Critério 2 — mais atend. efetivos';
   return 'Critério 3 — entrou depois na fila';
 }
-
-function calcVirtual(excId) {
+function calcVirtual(excId){
   const a=VS.filter(v=>v.status!=='ferias'&&v.ativo&&v.id!==excId);
   return Math.round(a.reduce((s,v)=>s+v.atend_hoje,0)/(a.length||1));
 }
 
-// ── BANCO ─────────────────────────────────────────────────────────────────
-async function loadVendedores() {
-  const {data,error}=await db.from('vendedores').select('*').eq('ativo',true).order('id');
-  if(error){toast('Erro ao carregar: '+error.message,'red');return;}
+// ── LOGIN ─────────────────────────────────────────────────────────────────
+async function fazerLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const senha=document.getElementById('login-senha').value;
+  const btn=document.getElementById('btn-login');
+  const err=document.getElementById('login-err');
+  err.style.display='none';
+  btn.disabled=true;btn.textContent='Entrando...';
+
+  const {data,error}=await db.auth.signInWithPassword({email,password:senha});
+  if(error){
+    err.textContent='E-mail ou senha incorretos.';
+    err.style.display='block';
+    btn.disabled=false;btn.textContent='Entrar';
+    return;
+  }
+
+  const {data:perfil}=await db.from('perfis').select('*').eq('id',data.user.id).single();
+  if(!perfil){
+    err.textContent='Usuário sem perfil configurado. Fale com o administrador.';
+    err.style.display='block';
+    await db.auth.signOut();
+    btn.disabled=false;btn.textContent='Entrar';
+    return;
+  }
+
+  PERFIL_ATUAL=perfil;
+  await iniciarSistema();
+  btn.disabled=false;btn.textContent='Entrar';
+}
+
+async function sair(){
+  await db.auth.signOut();
+  PERFIL_ATUAL=null;VENDEDOR_ATUAL=null;VS=[];HS=[];
+  document.getElementById('sistema').style.display='none';
+  document.getElementById('tela-login').style.display='flex';
+}
+
+// ── INICIAR SISTEMA ───────────────────────────────────────────────────────
+async function iniciarSistema(){
+  document.getElementById('tela-login').style.display='none';
+  document.getElementById('sistema').style.display='block';
+  document.getElementById('nav-user').textContent=PERFIL_ATUAL.nome+' ('+traduzPerfil(PERFIL_ATUAL.perfil)+')';
+
+  // Montar abas conforme perfil
+  const tabs=document.getElementById('nav-tabs');
+  tabs.innerHTML='';
+  if(PERFIL_ATUAL.perfil==='vendedor'){
+    addTab(tabs,'Minha Fila','vendedor-mobile');
+  } else {
+    addTab(tabs,'Recepção','recepcao');
+    addTab(tabs,'Vendedores','vendedores');
+    addTab(tabs,'Gestão','gestao');
+    if(PERFIL_ATUAL.perfil==='admin') addTab(tabs,'Usuários','usuarios');
+    addTab(tabs,'TV da Sala','tv');
+  }
+
+  await loadVendedores();
+  await loadHistorico();
+  if(PERFIL_ATUAL.perfil==='admin') await loadUsuarios();
+
+  // Ativar primeira aba
+  tabs.querySelector('.nav-tab')?.click();
+
+  // Se for vendedor, carregar dados próprios
+  if(PERFIL_ATUAL.perfil==='vendedor' && PERFIL_ATUAL.vendedor_id){
+    VENDEDOR_ATUAL=VS.find(v=>v.id===PERFIL_ATUAL.vendedor_id)||null;
+    renderVendedorMobile();
+  }
+}
+
+function traduzPerfil(p){
+  return p==='admin'?'Admin':p==='recepcao'?'Recepção':'Vendedor';
+}
+
+function addTab(container,label,page){
+  const btn=document.createElement('button');
+  btn.className='nav-tab';btn.textContent=label;
+  btn.onclick=()=>goPage(page,btn);
+  container.appendChild(btn);
+}
+
+// ── CARREGAR DADOS ────────────────────────────────────────────────────────
+async function loadVendedores(){
+  const {data}=await db.from('vendedores').select('*').eq('ativo',true).order('id');
   VS=data||[];
   renderAll();
 }
-
-async function loadHistorico() {
-  const {data}=await db.from('historico').select('*').order('created_at',{ascending:false}).limit(50);
+async function loadHistorico(){
+  const {data}=await db.from('historico').select('*').order('created_at',{ascending:false}).limit(100);
   HS=data||[];
 }
+async function loadUsuarios(){
+  const {data}=await db.from('perfis').select('*').order('created_at');
+  USUARIOS=data||[];
+  renderUsuarios();
+}
 
-// ── AÇÕES ─────────────────────────────────────────────────────────────────
-async function registrarCliente() {
+// ── REGISTRAR CLIENTE ─────────────────────────────────────────────────────
+async function registrarCliente(){
   const nome=document.getElementById('f-nome').value.trim();
   const tel=document.getElementById('f-tel').value.trim();
   const interesse=document.getElementById('f-interesse').value;
   const obs=document.getElementById('f-obs').value.trim();
   if(!nome){toast('Informe o nome do cliente','red');return;}
 
-  const ord=ordem();
+  const ord=calcOrdem();
   if(!ord.length){toast('Nenhum vendedor disponível no momento','amber');return;}
 
-  const v=ord[0];
-  const c=crit(v,0,ord);
-  const agora=new Date().toISOString();
-
-  const btn=document.querySelector('[onclick="registrarCliente()"]');
-  btn.disabled=true; btn.textContent='Registrando...';
+  const v=ord[0],c=critUsado(v,0,ord),agora=new Date().toISOString();
+  const btn=document.getElementById('btn-registrar');
+  btn.disabled=true;btn.textContent='Registrando...';
 
   await db.from('vendedores').update({status:'atendendo',ultimo_atend:agora,atend_hoje:v.atend_hoje+1}).eq('id',v.id);
   await db.from('clientes').insert({nome,tel,interesse,observacao:obs,vendedor_id:v.id,vendedor_nome:v.nome,criterio:c});
@@ -403,43 +596,51 @@ async function registrarCliente() {
   document.getElementById('f-nome').value='';
   document.getElementById('f-tel').value='';
   document.getElementById('f-obs').value='';
+  btn.disabled=false;btn.textContent='Registrar e distribuir na fila';
 
-  btn.disabled=false; btn.textContent='Registrar e distribuir na fila';
   toast('Cliente atribuído a '+v.nome,'green');
   toast('📱 Notificação enviada para '+v.nome.split(' ')[0],'amber');
-
-  await loadVendedores();
-  await loadHistorico();
+  await loadVendedores();await loadHistorico();
 }
 
-async function confirmarStatus() {
+// ── ALTERAR STATUS ────────────────────────────────────────────────────────
+async function confirmarStatus(){
   const id=parseInt(document.getElementById('ms-vend').value);
   const ns=document.getElementById('ms-status').value;
-  const v=VS.find(x=>x.id===id); if(!v) return;
-
+  const v=VS.find(x=>x.id===id);if(!v)return;
   const up={status:ns};
-  if(ns==='disponivel') up.entrou_as=new Date().toISOString();
+  if(ns==='disponivel')up.entrou_as=new Date().toISOString();
   if(v.status==='ferias'&&ns==='disponivel'){
     up.virtual=calcVirtual(id);
-    toast(v.nome+' voltou de férias — +'+up.virtual+' atendimentos virtuais creditados','purple');
+    toast(v.nome+' voltou de férias — +'+up.virtual+' atend. virtuais','purple');
   }
-
   await db.from('vendedores').update(up).eq('id',id);
-  await db.from('log_status').insert({vendedor_id:id,vendedor_nome:v.nome,status_anterior:v.status,status_novo:ns,alterado_por:'recepcionista'});
-
+  await db.from('log_status').insert({vendedor_id:id,vendedor_nome:v.nome,status_anterior:v.status,status_novo:ns,alterado_por:PERFIL_ATUAL.email});
   toast('Status de '+v.nome+' → '+SL[ns],'amber');
   toast('📱 '+v.nome.split(' ')[0]+' foi notificado(a)','green');
   closeModal('modal-status');
   await loadVendedores();
 }
 
-async function salvarVendedor() {
+// ── STATUS DO VENDEDOR (tela mobile) ─────────────────────────────────────
+async function mudarStatusVendedor(ns){
+  if(!VENDEDOR_ATUAL)return;
+  const up={status:ns};
+  if(ns==='disponivel')up.entrou_as=new Date().toISOString();
+  await db.from('vendedores').update(up).eq('id',VENDEDOR_ATUAL.id);
+  toast('Status atualizado para '+SL[ns],'green');
+  await loadVendedores();
+  VENDEDOR_ATUAL=VS.find(v=>v.id===VENDEDOR_ATUAL.id)||null;
+  renderVendedorMobile();
+}
+
+// ── SALVAR VENDEDOR ───────────────────────────────────────────────────────
+async function salvarVendedor(){
   const id=document.getElementById('mv-id').value;
   const nome=document.getElementById('mv-nome').value.trim();
   const tel=document.getElementById('mv-tel').value.trim();
   const email=document.getElementById('mv-email').value.trim();
   if(!nome){toast('Informe o nome','red');return;}
-
   if(id){
     await db.from('vendedores').update({nome,tel,email}).eq('id',parseInt(id));
     toast('Dados de '+nome+' atualizados','green');
@@ -451,24 +652,98 @@ async function salvarVendedor() {
   await loadVendedores();
 }
 
+// ── CRIAR USUÁRIO ─────────────────────────────────────────────────────────
+async function criarUsuario(){
+  const nome=document.getElementById('mu-nome').value.trim();
+  const email=document.getElementById('mu-email').value.trim();
+  const senha=document.getElementById('mu-senha').value;
+  const perfil=document.getElementById('mu-perfil').value;
+  const vendId=perfil==='vendedor'?parseInt(document.getElementById('mu-vendedor-id').value):null;
+  if(!nome||!email||!senha){toast('Preencha todos os campos','red');return;}
+  if(senha.length<6){toast('Senha deve ter pelo menos 6 caracteres','red');return;}
+
+  const btn=document.getElementById('btn-criar-usuario');
+  btn.disabled=true;btn.textContent='Criando...';
+
+  // Criar usuário no Supabase Auth via Admin API não está disponível no client
+  // Usamos uma função edge ou inserimos direto via SQL — simplificamos:
+  // Criar o usuário e pedir para ele redefinir a senha
+  const {data,error}=await db.auth.admin?.createUser?.({email,password:senha,email_confirm:true}) || {data:null,error:{message:'use SQL'}};
+
+  if(error || !data?.user){
+    // Alternativa: orientar a criar manualmente no Supabase
+    toast('Crie o usuário no Supabase Auth e depois adicione o perfil aqui','amber');
+    // Salva perfil com ID temporário baseado no email para associar depois
+    const {data:authData}=await db.from('perfis').select('id').eq('email',email).single();
+    if(authData){
+      await db.from('perfis').update({nome,perfil,vendedor_id:vendId}).eq('email',email);
+    }
+    btn.disabled=false;btn.textContent='Criar usuário';
+    closeModal('modal-usuario');
+    await loadUsuarios();
+    return;
+  }
+
+  await db.from('perfis').insert({id:data.user.id,email,nome,perfil,vendedor_id:vendId});
+  toast(nome+' criado com sucesso','green');
+  btn.disabled=false;btn.textContent='Criar usuário';
+  closeModal('modal-usuario');
+  await loadUsuarios();
+}
+
+// ── EXCLUIR ───────────────────────────────────────────────────────────────
+function confirmarExcluir(msg, fn){
+  document.getElementById('excluir-msg').textContent=msg;
+  document.getElementById('btn-confirmar-excluir').onclick=async()=>{
+    await fn();
+    closeModal('modal-excluir');
+  };
+  openModal('modal-excluir');
+}
+
+async function excluirHistorico(id, clienteNome){
+  confirmarExcluir('Excluir atendimento de "'+clienteNome+'" do histórico?', async()=>{
+    await db.from('historico').delete().eq('id',id);
+    toast('Registro excluído','green');
+    await loadHistorico();
+  });
+}
+
+async function excluirVendedor(id, nome){
+  confirmarExcluir('Desativar vendedor "'+nome+'"? Ele sairá da fila mas o histórico é mantido.', async()=>{
+    await db.from('vendedores').update({ativo:false}).eq('id',id);
+    toast(nome+' removido da equipe','green');
+    await loadVendedores();
+  });
+}
+
+async function excluirUsuario(id, nome){
+  confirmarExcluir('Excluir acesso de "'+nome+'"?', async()=>{
+    await db.from('perfis').delete().eq('id',id);
+    toast('Acesso de '+nome+' removido','green');
+    await loadUsuarios();
+  });
+}
+
 // ── RENDERS ───────────────────────────────────────────────────────────────
-function renderAll(){renderRec();renderVend();renderGestao();renderTV();}
+function renderAll(){
+  if(PERFIL_ATUAL?.perfil==='vendedor'){renderVendedorMobile();return;}
+  renderRec();renderVend();renderGestao();renderTV();
+}
 
 function renderRec(){
-  const ord=ordem();
+  const ord=calcOrdem();
   document.getElementById('fila-count').textContent=ord.length+' disponível'+(ord.length!==1?'is':'');
   const fl=document.getElementById('fila-lista');
-  if(!ord.length){fl.innerHTML='<div class="loading">Nenhum vendedor disponível</div>';} 
-  else {
+  if(!ord.length){fl.innerHTML='<div class="loading">Nenhum vendedor disponível</div>';}
+  else{
     fl.innerHTML=ord.slice(0,5).map((v,i)=>{
       const pc=i===0?'pos-1':i===1?'pos-2':i===2?'pos-3':'pos-n';
       return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)${i===0?';background:rgba(0,214,126,0.03)':''}">
         <div class="pos-badge ${pc}">${i+1}º</div>
         <div class="avatar ${avc(v.id)}">${ini(v.nome)}</div>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:${i===0?600:400};color:${i===0?'var(--green)':'var(--text)'}">${v.nome}</div>
-          <div class="text-sm">${ago(v.ultimo_atend)} · ${v.atend_hoje+v.virtual} efetivos</div>
-        </div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:${i===0?600:400};color:${i===0?'var(--green)':'var(--text)'}">${v.nome}</div>
+        <div class="text-sm">${ago(v.ultimo_atend)} · ${v.atend_hoje+v.virtual} efetivos</div></div>
         ${i===0?'<span class="badge b-green"><span class="badge-dot"></span>Próximo</span>':''}
       </div>`;
     }).join('');
@@ -483,18 +758,16 @@ function renderRec(){
 }
 
 function renderVend(){
-  const ord=ordem(); const pm={};
-  ord.forEach((v,i)=>pm[v.id]=i);
+  const ord=calcOrdem();const pm={};ord.forEach((v,i)=>pm[v.id]=i);
   const lista=VS.filter(v=>filtro==='todos'||v.status===filtro)
     .sort((a,b)=>(pm[a.id]??999)-(pm[b.id]??999)||a.nome.localeCompare(b.nome));
-
   document.getElementById('v-count-title').textContent=VS.length+' vendedores';
   document.getElementById('fila-strip').innerHTML=ord.slice(0,8).map((v,i)=>
     `<span style="padding:3px 10px;border-radius:6px;font-size:12px;background:${i===0?'var(--green-bg)':'var(--bg3)'};color:${i===0?'var(--green)':'var(--text2)'};border:1px solid ${i===0?'rgba(0,214,126,0.2)':'var(--border)'}">${i===0?'→ ':''}${i+1}. ${v.nome.split(' ')[0]}</span>`
   ).join('')||'<span class="text-sm">Nenhum disponível</span>';
 
   document.getElementById('tbody-v').innerHTML=lista.map(v=>{
-    const r=pm[v.id]; const n=r===0;
+    const r=pm[v.id];const n=r===0;
     const pc=r===0?'pos-1':r===1?'pos-2':r===2?'pos-3':'pos-n';
     return `<tr class="${n?'row-next':''}">
       <td>${v.status==='disponivel'?`<div class="pos-badge ${pc}">${r+1}º</div>`:'<div class="pos-badge pos-n">—</div>'}</td>
@@ -511,6 +784,7 @@ function renderVend(){
       <td><div style="display:flex;gap:6px">
         <button class="btn btn-sm" onclick="openModalVendedor(${v.id})">Editar</button>
         <button class="btn btn-sm" onclick="openModalStatus(${v.id})">Status</button>
+        <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${v.id},'${v.nome.replace(/'/g,"\\'")}')">Remover</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -521,27 +795,87 @@ function renderGestao(){
   document.getElementById('g-disp').textContent=VS.filter(v=>v.status==='disponivel').length;
   document.getElementById('g-atend').textContent=VS.filter(v=>v.status==='atendendo').length;
   document.getElementById('g-indisp').textContent=VS.filter(v=>v.status==='indisponivel'||v.status==='ferias').length;
-
-  const rank=VS.slice().sort((a,b)=>b.atend_hoje-a.atend_hoje);
-  document.getElementById('tbody-rank').innerHTML=rank.slice(0,10).map((v,i)=>
+  document.getElementById('tbody-rank').innerHTML=VS.slice().sort((a,b)=>b.atend_hoje-a.atend_hoje).slice(0,10).map((v,i)=>
     `<tr><td><strong>${i+1}</strong></td>
     <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar ${avc(v.id)}" style="width:28px;height:28px;font-size:11px">${ini(v.nome)}</div><span>${v.nome}</span></div></td>
     <td style="font-family:'DM Mono',monospace;font-weight:500">${v.atend_hoje}</td>
     <td><span class="badge ${SB[v.status]}"><span class="badge-dot"></span>${SL[v.status]}</span></td></tr>`
   ).join('');
-
   document.getElementById('hist-count').textContent=HS.length+' registros';
   document.getElementById('hist-body').innerHTML=!HS.length
     ?'<div class="loading">Nenhum atendimento ainda</div>'
-    :HS.map(h=>`<div style="display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)">
+    :HS.map(h=>`<div style="display:flex;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border);align-items:flex-start">
         <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:40px;padding-top:2px">${fmtH(h.created_at)}</div>
-        <div><div style="font-size:13px"><strong>${h.cliente_nome}</strong> → ${h.vendedor_nome}</div>
-        <div class="text-sm">${h.interesse} · <span style="color:var(--text3)">${h.criterio}</span></div></div>
+        <div style="flex:1"><div style="font-size:13px"><strong>${h.cliente_nome}</strong> → ${h.vendedor_nome}</div>
+        <div class="text-sm">${h.interesse}</div></div>
+        <button class="btn btn-sm btn-danger" onclick="excluirHistorico(${h.id},'${h.cliente_nome.replace(/'/g,"\\'")}')">✕</button>
+      </div>`).join('');
+}
+
+function renderUsuarios(){
+  const tbody=document.getElementById('tbody-usuarios');
+  if(!tbody)return;
+  tbody.innerHTML=USUARIOS.map(u=>{
+    const vend=VS.find(v=>v.id===u.vendedor_id);
+    const pBadge=u.perfil==='admin'?'b-purple':u.perfil==='recepcao'?'b-blue':'b-green';
+    const pLabel=u.perfil==='admin'?'Admin':u.perfil==='recepcao'?'Recepção':'Vendedor';
+    return `<tr>
+      <td style="font-weight:500">${u.nome}</td>
+      <td class="text-sm">${u.email}</td>
+      <td><span class="badge ${pBadge}">${pLabel}</span></td>
+      <td class="text-sm">${vend?vend.nome:'—'}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="excluirUsuario('${u.id}','${u.nome.replace(/'/g,"\\'")}')">Remover acesso</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderVendedorMobile(){
+  if(!VENDEDOR_ATUAL){
+    document.getElementById('vend-cliente-card').innerHTML='<div class="loading">Vendedor não vinculado. Fale com o administrador.</div>';
+    return;
+  }
+  const v=VENDEDOR_ATUAL;
+  // Último cliente atribuído a ele
+  const meuCliente=HS.find(h=>h.vendedor_nome===v.nome);
+  const cardEl=document.getElementById('vend-cliente-card');
+  if(meuCliente&&v.status==='atendendo'){
+    cardEl.innerHTML=`<div class="vend-card-cliente">
+      <div style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Cliente atual</div>
+      <h2>${meuCliente.cliente_nome}</h2>
+      <div class="interesse">${meuCliente.interesse}</div>
+      <div style="font-size:11px;color:var(--text3)">${fmtH(meuCliente.created_at)}</div>
+    </div>`;
+  } else {
+    cardEl.innerHTML=`<div style="padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;text-align:center;color:var(--text3);font-size:13px">
+      ${v.status==='disponivel'?'Você está disponível — aguardando próximo cliente':'Sem cliente no momento'}
+    </div>`;
+  }
+
+  // Stats
+  const pos=calcOrdem().findIndex(x=>x.id===v.id);
+  document.getElementById('vend-stats').innerHTML=`
+    <div class="vend-stat"><div class="vend-stat-n">${v.atend_hoje}</div><div class="vend-stat-l">Atendidos hoje</div></div>
+    <div class="vend-stat"><div class="vend-stat-n">${pos>=0?pos+1+'º':'—'}</div><div class="vend-stat-l">Posição na fila</div></div>
+    <div class="vend-stat"><div class="vend-stat-n">${v.virtual>0?'+'+v.virtual:'—'}</div><div class="vend-stat-l">Virtuais</div></div>`;
+
+  // Botões de status
+  ['disp','atend','indisp'].forEach(k=>document.getElementById('sbtn-'+k).className='sbtn');
+  if(v.status==='disponivel') document.getElementById('sbtn-disp').className='sbtn active-green';
+  else if(v.status==='atendendo') document.getElementById('sbtn-atend').className='sbtn active-amber';
+  else document.getElementById('sbtn-indisp').className='sbtn active-gray';
+
+  // Histórico do vendedor
+  const meus=HS.filter(h=>h.vendedor_nome===v.nome).slice(0,10);
+  document.getElementById('vend-historico-lista').innerHTML=!meus.length
+    ?'<div class="loading">Nenhum atendimento hoje</div>'
+    :meus.map(h=>`<div style="display:flex;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);padding-top:2px;min-width:40px">${fmtH(h.created_at)}</div>
+        <div><div style="font-size:13px;font-weight:500">${h.cliente_nome}</div><div class="text-sm">${h.interesse}</div></div>
       </div>`).join('');
 }
 
 function renderTV(){
-  const ord=ordem();
+  const ord=calcOrdem();
   const nowEl=document.getElementById('tv-now');
   if(HS.length){
     const h=HS[0];
@@ -556,15 +890,15 @@ function renderTV(){
     ?'<div style="padding:24px;text-align:center;color:rgba(255,255,255,0.2)">Nenhum vendedor disponível</div>'
     :ord.slice(0,4).map((v,i)=>`<div class="tv-queue-row">
         <span class="tv-queue-num">${i+1}º</span>
-        <span class="tv-queue-name">Aguardando cliente</span>
+        <span class="tv-queue-name">Aguardando</span>
         <span class="tv-queue-seller">${v.nome}</span>
         <span class="tv-queue-st ${i===0?'st-next':'st-wait'}">${i===0?'Próximo':'Aguardando'}</span>
       </div>`).join('');
   document.getElementById('tv-team').innerHTML=VS.slice(0,12).map(v=>
-    `<div class="tv-seller-card ${v.status==='disponivel'?'free':v.status==='atendendo'?'busy':''}">
-      <div class="tv-seller-num">${v.atend_hoje}</div>
-      <div class="tv-seller-name">${v.nome.split(' ')[0]}</div>
-      <div class="tv-seller-st" style="color:${v.status==='disponivel'?'var(--green)':v.status==='atendendo'?'var(--amber)':'var(--text3)'}">${SL[v.status]}</div>
+    `<div class="tv-sc ${v.status==='disponivel'?'free':v.status==='atendendo'?'busy':''}">
+      <div class="tv-sc-num">${v.atend_hoje}</div>
+      <div class="tv-sc-name">${v.nome.split(' ')[0]}</div>
+      <div class="tv-sc-st" style="color:${v.status==='disponivel'?'var(--green)':v.status==='atendendo'?'var(--amber)':'var(--text3)'}">${SL[v.status]}</div>
     </div>`).join('');
 }
 
@@ -582,6 +916,15 @@ function openModalVendedor(id){
   document.getElementById('mv-tel').value=v?v.tel||'':'';
   document.getElementById('mv-email').value=v?v.email||'':'';
   openModal('modal-vendedor');
+}
+function openModalNovoUsuario(){
+  document.getElementById('mu-vendedor-id').innerHTML=VS.map(v=>`<option value="${v.id}">${v.nome}</option>`).join('');
+  toggleVendedorSelect();
+  openModal('modal-usuario');
+}
+function toggleVendedorSelect(){
+  const p=document.getElementById('mu-perfil').value;
+  document.getElementById('mu-vend-grupo').style.display=p==='vendedor'?'block':'none';
 }
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -610,7 +953,7 @@ function goPage(id,btn){
 // ── TOAST ─────────────────────────────────────────────────────────────────
 function toast(msg,type='green'){
   const el=document.createElement('div');
-  el.className='toast t-'+type; el.textContent=msg;
+  el.className='toast t-'+type;el.textContent=msg;
   document.getElementById('toast-wrap').appendChild(el);
   setTimeout(()=>el.remove(),3500);
 }
@@ -619,17 +962,24 @@ function toast(msg,type='green'){
 setInterval(()=>{
   const n=new Date(),h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
   const nc=document.getElementById('nav-clock'),tc=document.getElementById('tv-clock');
-  if(nc)nc.textContent=h+':'+m; if(tc)tc.textContent=h+':'+m+':'+s;
+  if(nc)nc.textContent=h+':'+m;if(tc)tc.textContent=h+':'+m+':'+s;
 },1000);
 
-// ── FILTRO INICIAL ────────────────────────────────────────────────────────
-setFiltro('todos', document.getElementById('f-todos'));
+// ── AUTO-REFRESH ──────────────────────────────────────────────────────────
+setInterval(async()=>{
+  if(!PERFIL_ATUAL)return;
+  await loadVendedores();await loadHistorico();
+  if(PERFIL_ATUAL.perfil==='vendedor'){VENDEDOR_ATUAL=VS.find(v=>v.id===PERFIL_ATUAL.vendedor_id)||null;renderVendedorMobile();}
+},15000);
 
-// ── AUTO-REFRESH a cada 15s ───────────────────────────────────────────────
-setInterval(async()=>{await loadVendedores();await loadHistorico();},15000);
-
-// ── INICIALIZAR ───────────────────────────────────────────────────────────
-(async()=>{await loadVendedores();await loadHistorico();})();
+// ── VERIFICAR SESSÃO AO CARREGAR ──────────────────────────────────────────
+(async()=>{
+  const {data:{session}}=await db.auth.getSession();
+  if(session){
+    const {data:perfil}=await db.from('perfis').select('*').eq('id',session.user.id).single();
+    if(perfil){PERFIL_ATUAL=perfil;await iniciarSistema();}
+  }
+})();
 </script>
 </body>
 </html>

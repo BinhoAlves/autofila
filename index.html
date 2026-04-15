@@ -892,7 +892,7 @@ function renderVend(){
       <td style="font-weight:500;font-family:'DM Mono',monospace">${v.atend_hoje+v.virtual}</td>
       <td><div style="display:flex;gap:5px">
         <button class="btn btn-sm" onclick="openModalStatus(${v.id})">Status</button>
-        <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${v.id},'${v.nome.replace(/'/g,"\\'")}')">Remover</button>
+        ${PERFIL_ATUAL.perfil==='admin'?`<button class="btn btn-sm btn-danger" onclick="excluirVendedor(${v.id},'${v.nome.replace(/'/g,"\\'")}')">Remover</button>`:''}
       </div></td>
     </tr>`;
   }).join('');

@@ -114,7 +114,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .vend-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
 .vend-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;text-align:center}
 .vend-stat-n{font-size:22px;font-weight:600}.vend-stat-l{font-size:11px;color:var(--text2);margin-top:2px}
-.status-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.status-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 /* MOBILE RESPONSIVO */
 @media(max-width:600px){
   .nav{padding:0 12px}
@@ -297,7 +297,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="section-title">Meu status</div>
       <div class="status-btns" style="margin-bottom:14px">
         <button class="sbtn" id="sbtn-disp" onclick="mudarStatusVendedor('disponivel')">Disponível</button>
-        <button class="sbtn" id="sbtn-atend" onclick="mudarStatusVendedor('atendendo')">Atendendo</button>
         <button class="sbtn" id="sbtn-indisp" onclick="mudarStatusVendedor('indisponivel')">Indisponível</button>
       </div>
       <div class="card">
@@ -930,10 +929,9 @@ async function renderVendedorMobile(){
     <div class="vend-stat"><div class="vend-stat-n">${v.atend_hoje}</div><div class="vend-stat-l">Atendidos hoje</div></div>
     <div class="vend-stat"><div class="vend-stat-n">${pos>=0?pos+1+'º':'—'}</div><div class="vend-stat-l">Posição na fila</div></div>
     <div class="vend-stat"><div class="vend-stat-n">${v.virtual>0?'+'+v.virtual:'—'}</div><div class="vend-stat-l">Virtuais</div></div>`;
-  ['disp','atend','indisp'].forEach(k=>document.getElementById('sbtn-'+k).className='sbtn');
+  ['disp','indisp'].forEach(k=>document.getElementById('sbtn-'+k).className='sbtn');
   if(v.status==='disponivel')document.getElementById('sbtn-disp').className='sbtn active-green';
-  else if(v.status==='atendendo')document.getElementById('sbtn-atend').className='sbtn active-amber';
-  else document.getElementById('sbtn-indisp').className='sbtn active-red';
+  else if(v.status==='indisponivel'||v.status==='ferias')document.getElementById('sbtn-indisp').className='sbtn active-red';
   const meus=HS.filter(h=>h.vendedor_id===v.id).slice(0,10);
   document.getElementById('vend-historico-lista').innerHTML=!meus.length
     ?'<div class="loading">Nenhum atendimento hoje</div>'

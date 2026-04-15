@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AutoFila — Sistema de Atendimento</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -72,27 +72,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .sbtn.active-amber{background:var(--amber-bg);color:var(--amber);border-color:rgba(245,166,35,0.3)}
 .sbtn.active-red{background:var(--red-bg);color:var(--red);border-color:rgba(255,79,106,0.3)}
 /* TV */
-.tv-screen{background:#070a0f;min-height:100vh}
-.tv-header{background:#0d1117;border-bottom:1px solid rgba(255,255,255,0.05);padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
-.tv-logo{font-size:15px;font-weight:600;color:#fff}.tv-logo span{color:var(--green)}
-.tv-body{padding:20px 28px;display:grid;grid-template-columns:1fr 400px;gap:20px;height:calc(100vh - 53px)}
-.tv-left,.tv-right{display:flex;flex-direction:column;gap:16px}
-.tv-now{background:linear-gradient(135deg,rgba(0,214,126,0.12),rgba(0,214,126,0.04));border:1px solid rgba(0,214,126,0.2);border-radius:18px;padding:24px 28px;display:flex;align-items:center;gap:20px}
-.tv-now-num{width:64px;height:64px;border-radius:14px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#000;flex-shrink:0;font-family:'DM Mono',monospace}
-.tv-now-label{font-size:10px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
-.tv-now-name{font-size:28px;font-weight:600;color:#fff;line-height:1.1}
-.tv-now-seller{font-size:14px;color:rgba(255,255,255,0.5);margin-top:5px}
-.tv-sec-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
-.tv-queue-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:12px;overflow:hidden}
-.tv-queue-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.tv-screen{background:#070a0f;min-height:100vh;overflow:hidden}
+.tv-header{background:#0d1117;border-bottom:1px solid rgba(255,255,255,0.05);padding:1.2vh 2.5vw;display:flex;align-items:center;justify-content:space-between}
+.tv-logo{font-size:clamp(13px,1.4vw,20px);font-weight:600;color:#fff}.tv-logo span{color:var(--green)}
+.tv-body{padding:1.5vh 2.5vw;display:grid;grid-template-columns:1fr 32vw;gap:1.5vw;height:calc(100vh - 5.5vh);overflow:hidden}
+.tv-left,.tv-right{display:flex;flex-direction:column;gap:1.5vh;overflow:hidden}
+.tv-now{background:linear-gradient(135deg,rgba(0,214,126,0.12),rgba(0,214,126,0.04));border:1px solid rgba(0,214,126,0.2);border-radius:1.5vh;padding:2vh 2.5vw;display:flex;align-items:center;gap:2vw}
+.tv-now-num{width:clamp(48px,5.5vw,80px);height:clamp(48px,5.5vw,80px);border-radius:1vh;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:clamp(16px,2vw,30px);font-weight:700;color:#000;flex-shrink:0;font-family:'DM Mono',monospace}
+.tv-now-label{font-size:clamp(9px,0.8vw,13px);font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:0.5vh}
+.tv-now-name{font-size:clamp(20px,3.2vw,52px);font-weight:600;color:#fff;line-height:1.1}
+.tv-now-seller{font-size:clamp(11px,1.1vw,18px);color:rgba(255,255,255,0.5);margin-top:0.5vh}
+.tv-sec-label{font-size:clamp(9px,0.7vw,12px);font-weight:600;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:.1em;margin-bottom:0.8vh}
+.tv-queue-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:1.2vh;overflow:hidden}
+.tv-queue-row{display:flex;align-items:center;gap:1.2vw;padding:1.2vh 1.5vw;border-bottom:1px solid rgba(255,255,255,0.04)}
 .tv-queue-row:last-child{border-bottom:none}
-.tv-queue-st{font-size:11px;padding:3px 10px;border-radius:6px}
+.tv-queue-st{font-size:clamp(10px,0.8vw,13px);padding:0.3vh 0.8vw;border-radius:0.6vh}
 .st-next{background:rgba(0,214,126,0.12);color:#00d67e}.st-wait{background:rgba(245,166,35,0.12);color:#f5a623}
-.tv-team-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.tv-sc{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px}
-.tv-sc.free{border-color:rgba(0,214,126,0.15)}.tv-sc.busy{border-color:rgba(245,166,35,0.15)}
-.tv-sc-num{font-size:20px;font-weight:600;color:#fff}.tv-sc-name{font-size:11px;color:rgba(255,255,255,0.6);font-weight:500}
-.tv-sc-st{font-size:10px;margin-top:1px}.tv-empty{background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.08);border-radius:18px;padding:36px;text-align:center;color:rgba(255,255,255,0.2);font-size:14px}
+.tv-team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(80px,8vw,140px),1fr));gap:0.6vw;overflow:hidden;align-content:start}
+.tv-sc{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:1vh;padding:1vh 1.2vw}
+.tv-sc.free{border-color:rgba(0,214,126,0.2)}.tv-sc.busy{border-color:rgba(245,166,35,0.2)}
+.tv-sc-num{font-size:clamp(18px,2.2vw,36px);font-weight:700;color:#fff;line-height:1}
+.tv-sc-name{font-size:clamp(10px,0.9vw,16px);color:rgba(255,255,255,0.7);font-weight:500;margin-top:0.2vh;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tv-sc-st{font-size:clamp(9px,0.7vw,12px);margin-top:0.2vh}
+.tv-empty{background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.08);border-radius:1.5vh;padding:4vh;text-align:center;color:rgba(255,255,255,0.2);font-size:clamp(13px,1.2vw,20px)}
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
@@ -108,34 +110,78 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* RELATÓRIO */
 .rel-periodo{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
 .rel-periodo .form-group{margin-bottom:0;flex:1;min-width:140px}
-/* TROCAR SENHA */
+/* VENDEDOR MOBILE */
 .vend-mobile{max-width:480px;margin:0 auto}
 .vend-card-cliente{background:linear-gradient(135deg,rgba(0,214,126,0.12),rgba(0,214,126,0.04));border:1px solid rgba(0,214,126,0.2);border-radius:var(--radius-lg);padding:22px;margin-bottom:14px}
 .vend-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
 .vend-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;text-align:center}
 .vend-stat-n{font-size:22px;font-weight:600}.vend-stat-l{font-size:11px;color:var(--text2);margin-top:2px}
-.status-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-/* MOBILE RESPONSIVO */
-@media(max-width:600px){
-  .nav{padding:0 12px}
-  .nav-logo{font-size:14px;padding:12px 12px 12px 0}
+.status-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+
+/* ── BREAKPOINTS ─────────────────────────────────────────────────────────── */
+
+/* DESKTOP/TV — acima de 1025px: já coberto pelo CSS base */
+
+/* TABLET — 481px a 1024px */
+@media(min-width:481px) and (max-width:1024px){
+  .page{padding:16px}
+  .grid2{grid-template-columns:1fr 1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+  .grid4{grid-template-columns:1fr 1fr}
   .nav-tab{padding:14px 10px;font-size:12px}
-  .nav-right{gap:6px}
   .nav-user{display:none}
-  .page{padding:12px}
-  .card-hdr{padding:11px 14px}
-  .card-body{padding:14px}
+  .tbl th{font-size:11px}.tbl td{font-size:12px;padding:8px 10px}
+  .tv-body{grid-template-columns:1fr 40vw}
+  .vend-mobile{max-width:100%}
+}
+
+/* MOBILE — até 480px */
+@media(max-width:480px){
+  /* NAV */
+  .nav{padding:0 10px;overflow-x:auto;flex-wrap:nowrap}
+  .nav-logo{font-size:13px;padding:12px 10px 12px 0}
+  .nav-tab{padding:14px 9px;font-size:11px;flex-shrink:0}
+  .nav-right{gap:6px;flex-shrink:0}
+  .nav-user{display:none}
+  /* PAGE */
+  .page{padding:10px}
+  /* CARDS */
+  .card-hdr{padding:10px 12px}
+  .card-body{padding:12px}
+  /* GRID — tudo em 1 coluna */
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}
+  /* FORMULÁRIOS — 100% largura, stack vertical */
+  .form-input,.form-select{font-size:16px !important;min-height:44px}
+  .form-group{margin-bottom:12px}
+  /* BOTÕES — mínimo 44x44px touch target */
+  .btn{min-height:44px;min-width:44px;padding:10px 14px}
+  .btn-sm{min-height:36px;padding:8px 12px}
+  .btn-primary{min-height:48px;font-size:15px}
+  /* TABELAS — scroll horizontal */
+  .card{overflow-x:auto}
+  .tbl{min-width:500px}
   .tbl th,.tbl td{padding:8px 10px;font-size:12px}
-  .metric{padding:12px}
-  .metric-val{font-size:22px}
+  /* MÉTRICAS */
+  .metric{padding:12px}.metric-val{font-size:20px}
+  /* STATUS BTNS VENDEDOR */
+  .sbtn{min-height:44px;font-size:13px}
+  .status-btns{grid-template-columns:1fr 1fr 1fr;gap:6px}
+  /* TOAST */
+  .toast-wrap{top:8px;right:8px;left:8px}
+  .toast{max-width:100%}
+  /* MODAL */
+  .modal{padding:18px;margin:10px}
+  /* VENDEDOR */
   .vend-mobile{max-width:100%}
   .vend-card-cliente{padding:16px}
+  /* RELATÓRIO */
   .rel-periodo{flex-direction:column}
   .rel-periodo .form-group{min-width:100%}
-  .tv-body{grid-template-columns:1fr;padding:16px}
+  /* TV — simplificada no mobile */
+  .tv-body{grid-template-columns:1fr;padding:1.5vh}
   .tv-right{display:none}
-  .tv-now-name{font-size:22px}
-  .tv-now-num{width:52px;height:52px;font-size:18px}
+  .tv-now-name{font-size:clamp(18px,6vw,28px)}
+  .tv-now-num{width:48px;height:48px;font-size:16px}
 }
 </style>
 </head>

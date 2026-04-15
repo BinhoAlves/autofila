@@ -898,7 +898,8 @@ async function renderVendedorMobile(){
   // Buscar tel do cliente ativo
   let telCliente='';
   if(meuAtivo){
-    const {data:cli}=await db.from('clientes').select('tel,vendido').eq('vendedor_id',v.id).eq('encerrado',false).single().catch(()=>({data:null}));
+    let cli=null;
+    try{const {data}=await db.from('clientes').select('tel,vendido').eq('vendedor_id',v.id).eq('encerrado',false).maybeSingle();cli=data;}catch(e){}
     if(cli)telCliente=cli.tel||'';
   }
   const cardEl=document.getElementById('vend-cliente-card');

@@ -655,10 +655,16 @@ async function confirmarStatus(){
 async function mudarStatusVendedor(ns){
   if(!VENDEDOR_ATUAL)return;
   const up={status:ns};
-  if(ns==='disponivel')up.entrou_as=new Date().toISOString();
+  if(ns==='disponivel'){
+    up.entrou_as=new Date().toISOString();
+    // Encerrar atendimento ativo no histórico
+    await db.from('historico').update({encerrado:true}).eq('vendedor_id',VENDEDOR_ATUAL.id).eq('encerrado',false);
+    await db.from('clientes').update({encerrado:true}).eq('vendedor_id',VENDEDOR_ATUAL.id).eq('encerrado',false);
+  }
   await db.from('vendedores').update(up).eq('id',VENDEDOR_ATUAL.id);
   toast('Status atualizado para '+SL[ns],'green');
   await loadVendedores();
+  await loadHistorico();
   VENDEDOR_ATUAL=VS.find(v=>v.id===VENDEDOR_ATUAL.id)||null;
   renderVendedorMobile();
 }
@@ -1032,13 +1038,14 @@ function renderVendedorMobile(){
 
 function renderTV(){
   const ord=calcOrdem();
+  // Buscar atendimento ativo — não encerrado e vendedor ainda atendendo
+  const atendimentoAtivo = HS.find(h => !h.encerrado && VS.find(v=>v.nome===h.vendedor_nome&&v.status==='atendendo'));
   const nowEl=document.getElementById('tv-now');
-  if(HS.length){
-    const h=HS[0];
+  if(atendimentoAtivo){
     nowEl.innerHTML=`<div class="tv-now"><div class="tv-now-num">A${String(HS.length).padStart(2,'0')}</div>
       <div><div class="tv-now-label">Sendo atendido agora</div>
-      <div class="tv-now-name">${h.cliente_nome}</div>
-      <div class="tv-now-seller">Vendedor: ${h.vendedor_nome} · ${h.interesse}</div></div></div>`;
+      <div class="tv-now-name">${atendimentoAtivo.cliente_nome}</div>
+      <div class="tv-now-seller">Vendedor: ${atendimentoAtivo.vendedor_nome} · ${atendimentoAtivo.interesse}</div></div></div>`;
   } else {
     nowEl.innerHTML='<div class="tv-empty">Aguardando próximo cliente...</div>';
   }

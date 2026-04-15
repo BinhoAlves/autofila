@@ -3,133 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AutoFila</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>AutoFila — Sistema de Atendimento</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
-  --bg:#0d0f14;--bg2:#13161d;--bg3:#1a1e28;--bg4:#22273a;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-  --text:#e8eaf0;--text2:#8b90a0;--text3:#555b70;
-  --green:#00d67e;--green-bg:rgba(0,214,126,0.10);
-  --amber:#f5a623;--amber-bg:rgba(245,166,35,0.10);
-  --red:#ff4f6a;--red-bg:rgba(255,79,106,0.10);
-  --blue:#4f9eff;--blue-bg:rgba(79,158,255,0.10);
-  --purple:#9b7fff;--purple-bg:rgba(155,127,255,0.10);
-  --r:10px;--rl:16px;
-}
+:root{--bg:#0d0f14;--bg2:#13161d;--bg3:#1a1e28;--bg4:#22273a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e8eaf0;--text2:#8b90a0;--text3:#555b70;--green:#00d67e;--green-bg:rgba(0,214,126,0.10);--amber:#f5a623;--amber-bg:rgba(245,166,35,0.10);--red:#ff4f6a;--red-bg:rgba(255,79,106,0.10);--blue:#4f9eff;--blue-bg:rgba(79,158,255,0.10);--purple:#9b7fff;--purple-bg:rgba(155,127,255,0.10);--radius:10px;--radius-lg:16px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
-/* LOGIN */
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:40px;width:100%;max-width:380px}
-.login-logo{font-size:24px;font-weight:700;margin-bottom:6px}.login-logo span{color:var(--green)}
-.login-sub{font-size:13px;color:var(--text2);margin-bottom:28px}
-.err-box{background:var(--red-bg);border:1px solid rgba(255,79,106,0.2);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:14px;display:none}
-/* NAV */
-.nav{display:flex;align-items:center;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:100;min-height:52px;gap:0;flex-wrap:nowrap;overflow-x:auto}
-.nav-logo{font-weight:600;font-size:15px;padding:0 14px 0 0;border-right:1px solid var(--border);margin-right:6px;white-space:nowrap;flex-shrink:0}.nav-logo span{color:var(--green)}
-.nav-tab{padding:16px 12px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif;flex-shrink:0}
-.nav-tab.active{color:var(--green);border-bottom-color:var(--green)}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
-.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0}
+.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:40px;width:100%;max-width:400px}
+.login-logo{font-size:24px;font-weight:700;margin-bottom:8px}.login-logo span{color:var(--green)}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:32px}
+.login-err{background:var(--red-bg);border:1px solid rgba(255,79,106,0.2);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:16px;display:none}
+.nav{display:flex;align-items:center;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:0}
+.nav-logo{font-weight:600;font-size:15px;padding:14px 16px 14px 0;border-right:1px solid var(--border);margin-right:6px;white-space:nowrap}.nav-logo span{color:var(--green)}
+.nav-tab{padding:16px 12px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.nav-tab:hover{color:var(--text)}.nav-tab.active{color:var(--green);border-bottom:2px solid var(--green)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-user{font-size:11px;color:var(--text3)}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-/* PAGES */
-.page{display:none;padding:16px;max-width:1200px;margin:0 auto}.page.active{display:block}
-/* CARD */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:14px}
-.card-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.page{display:none;padding:20px;max-width:1200px;margin:0 auto}.page.active{display:block}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.card-hdr{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
 .card-hdr h3{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
-/* GRID */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr}}
-/* BADGE */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
-.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.bg{background:var(--green-bg);color:var(--green)}.bg .dot{background:var(--green)}
-.ba{background:var(--amber-bg);color:var(--amber)}.ba .dot{background:var(--amber)}
-.br{background:var(--red-bg);color:var(--red)}.br .dot{background:var(--red)}
-.bb{background:rgba(139,144,160,.1);color:var(--text2)}.bb .dot{background:var(--text3)}
-.bp{background:var(--purple-bg);color:var(--purple)}.bp .dot{background:var(--purple)}
-.bi{background:var(--blue-bg);color:var(--blue)}
-/* BTN */
-.btn{padding:7px 14px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text);transition:all .15s;font-family:'DM Sans',sans-serif}
+.card-body{padding:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:768px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.b-green{background:var(--green-bg);color:var(--green)}.b-green .badge-dot{background:var(--green)}
+.b-amber{background:var(--amber-bg);color:var(--amber)}.b-amber .badge-dot{background:var(--amber)}
+.b-red{background:var(--red-bg);color:var(--red)}.b-red .badge-dot{background:var(--red)}
+.b-blue{background:var(--blue-bg);color:var(--blue)}.b-blue .badge-dot{background:var(--blue)}
+.b-purple{background:var(--purple-bg);color:var(--purple)}.b-purple .badge-dot{background:var(--purple)}
+.b-gray{background:rgba(139,144,160,0.10);color:var(--text2)}.b-gray .badge-dot{background:var(--text3)}
+.btn{padding:7px 14px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text);transition:all .15s;font-family:'DM Sans',sans-serif}
 .btn:hover{background:var(--bg4)}.btn:disabled{opacity:.5;cursor:not-allowed}
-.btn-p{background:var(--green);color:#000;border-color:var(--green)}.btn-p:hover{background:#00f090}
+.btn-primary{background:var(--green);color:#000;border-color:var(--green)}.btn-primary:hover{background:#00f090}
 .btn-sm{padding:4px 10px;font-size:12px}
-.btn-d{background:var(--red-bg);color:var(--red);border-color:rgba(255,79,106,.2)}
-/* FORM */
-.fg{margin-bottom:14px}
-.fl{display:block;font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
-.fi,.fs{width:100%;padding:9px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif}
-.fi:focus,.fs:focus{outline:none;border-color:var(--green)}
-.fs option{background:var(--bg3)}
-/* METRIC */
-.metric{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px}
-.mv{font-size:26px;font-weight:600}.ml{font-size:12px;color:var(--text2);margin-top:3px}
-/* AVATAR */
-.av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
-.avG{background:var(--green-bg);color:var(--green)}.avA{background:var(--amber-bg);color:var(--amber)}
-.avB{background:var(--blue-bg);color:var(--blue)}.avR{background:var(--red-bg);color:var(--red)}
-.avP{background:var(--purple-bg);color:var(--purple)}.avX{background:rgba(139,144,160,.1);color:var(--text2)}
-/* TABLE */
+.btn-danger{background:var(--red-bg);color:var(--red);border-color:rgba(255,79,106,0.2)}.btn-danger:hover{background:rgba(255,79,106,0.2)}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:11px;font-weight:500;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+.form-input,.form-select{width:100%;padding:9px 11px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;transition:border .15s}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--green)}
+.form-select option{background:var(--bg3)}
+.metric{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.metric-val{font-size:26px;font-weight:600}.metric-lbl{font-size:12px;color:var(--text2);margin-top:3px}
+.avatar{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.av-green{background:var(--green-bg);color:var(--green)}.av-amber{background:var(--amber-bg);color:var(--amber)}
+.av-blue{background:var(--blue-bg);color:var(--blue)}.av-red{background:var(--red-bg);color:var(--red)}
+.av-gray{background:rgba(139,144,160,0.10);color:var(--text2)}.av-purple{background:var(--purple-bg);color:var(--purple)}
 .tbl{width:100%;border-collapse:collapse}
-.tbl th{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;padding:9px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}.tbl tr:hover td{background:rgba(255,255,255,.015)}
-.tbl tr.hl td{background:rgba(0,214,126,.04)}
-/* POS */
-.pos{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
-.p1{background:var(--green-bg);color:var(--green)}.p2{background:var(--amber-bg);color:var(--amber)}
-.p3{background:var(--blue-bg);color:var(--blue)}.pN{background:var(--bg4);color:var(--text3)}
-/* MODAL */
-.modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:16px}
-.modal-wrap.open{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:24px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto}
-.modal h3{font-size:15px;font-weight:600;margin-bottom:16px}
-.mf{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
-/* TOAST */
-.toast-wrap{position:fixed;top:14px;right:14px;display:flex;flex-direction:column;gap:7px;z-index:999}
-.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:11px 14px;font-size:13px;color:var(--text);max-width:280px;animation:tIn .2s ease;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-.toast.tG{border-left:3px solid var(--green)}.toast.tA{border-left:3px solid var(--amber)}
-.toast.tR{border-left:3px solid var(--red)}.toast.tP{border-left:3px solid var(--purple)}
-@keyframes tIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
-/* STATUS BTNS */
-.sbtn{padding:10px 6px;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .15s;font-family:'DM Sans',sans-serif;text-align:center}
-.sG{background:var(--green-bg);color:var(--green);border-color:rgba(0,214,126,.3)}
-.sA{background:var(--amber-bg);color:var(--amber);border-color:rgba(245,166,35,.3)}
-.sR{background:var(--red-bg);color:var(--red);border-color:rgba(255,79,106,.3)}
+.tbl th{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:9px 13px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}.tbl tr:hover td{background:rgba(255,255,255,0.015)}
+.tbl tr.row-next td{background:rgba(0,214,126,0.04)}
+.pos-badge{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.pos-1{background:var(--green-bg);color:var(--green)}.pos-2{background:var(--amber-bg);color:var(--amber)}
+.pos-3{background:var(--blue-bg);color:var(--blue)}.pos-n{background:var(--bg4);color:var(--text3)}
+.section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.text-sm{font-size:12px;color:var(--text2)}.loading{text-align:center;padding:28px;color:var(--text3);font-size:13px}
+/* STATUS BTNS VENDEDOR */
+.sbtn{padding:10px 8px;border-radius:var(--radius);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .15s;font-family:'DM Sans',sans-serif;text-align:center}
+.sbtn.active-green{background:var(--green-bg);color:var(--green);border-color:rgba(0,214,126,0.3)}
+.sbtn.active-amber{background:var(--amber-bg);color:var(--amber);border-color:rgba(245,166,35,0.3)}
+.sbtn.active-red{background:var(--red-bg);color:var(--red);border-color:rgba(255,79,106,0.3)}
 /* TV */
-.tv{background:#070a0f;min-height:100vh}
-.tv-hdr{background:#0d1117;border-bottom:1px solid rgba(255,255,255,.05);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.tv-screen{background:#070a0f;min-height:100vh}
+.tv-header{background:#0d1117;border-bottom:1px solid rgba(255,255,255,0.05);padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
 .tv-logo{font-size:15px;font-weight:600;color:#fff}.tv-logo span{color:var(--green)}
-.tv-body{padding:20px 24px;display:grid;grid-template-columns:1fr 280px;gap:20px;height:calc(100vh - 53px)}
+.tv-body{padding:20px 28px;display:grid;grid-template-columns:1fr 300px;gap:20px;height:calc(100vh - 53px)}
 .tv-left,.tv-right{display:flex;flex-direction:column;gap:16px}
-.tv-now{background:linear-gradient(135deg,rgba(0,214,126,.12),rgba(0,214,126,.04));border:1px solid rgba(0,214,126,.2);border-radius:18px;padding:24px;display:flex;align-items:center;gap:18px}
-.tv-num{width:60px;height:60px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#000;flex-shrink:0;font-family:'DM Mono',monospace}
-.tv-lbl{font-size:10px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
-.tv-name{font-size:26px;font-weight:600;color:#fff;line-height:1.1}
-.tv-seller{font-size:13px;color:rgba(255,255,255,.5);margin-top:4px}
-.tv-slbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
-.tv-q{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:12px;overflow:hidden}
-.tv-qr{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04)}
-.tv-qr:last-child{border-bottom:none}
-.tv-st{font-size:11px;padding:3px 9px;border-radius:6px}
-.stN{background:rgba(0,214,126,.12);color:#00d67e}.stW{background:rgba(245,166,35,.12);color:#f5a623}
-.tv-tg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.tv-sc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:10px 12px}
-.tv-sc.free{border-color:rgba(0,214,126,.15)}.tv-sc.busy{border-color:rgba(245,166,35,.15)}
-.tv-empty{background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);border-radius:18px;padding:36px;text-align:center;color:rgba(255,255,255,.2);font-size:14px}
-/* MISC */
-.txt-sm{font-size:12px;color:var(--text2)}.loading{text-align:center;padding:28px;color:var(--text3);font-size:13px}
-.sec-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.tv-now{background:linear-gradient(135deg,rgba(0,214,126,0.12),rgba(0,214,126,0.04));border:1px solid rgba(0,214,126,0.2);border-radius:18px;padding:24px 28px;display:flex;align-items:center;gap:20px}
+.tv-now-num{width:64px;height:64px;border-radius:14px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#000;flex-shrink:0;font-family:'DM Mono',monospace}
+.tv-now-label{font-size:10px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.tv-now-name{font-size:28px;font-weight:600;color:#fff;line-height:1.1}
+.tv-now-seller{font-size:14px;color:rgba(255,255,255,0.5);margin-top:5px}
+.tv-sec-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.tv-queue-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:12px;overflow:hidden}
+.tv-queue-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.tv-queue-row:last-child{border-bottom:none}
+.tv-queue-st{font-size:11px;padding:3px 10px;border-radius:6px}
+.st-next{background:rgba(0,214,126,0.12);color:#00d67e}.st-wait{background:rgba(245,166,35,0.12);color:#f5a623}
+.tv-team-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.tv-sc{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px}
+.tv-sc.free{border-color:rgba(0,214,126,0.15)}.tv-sc.busy{border-color:rgba(245,166,35,0.15)}
+.tv-sc-num{font-size:20px;font-weight:600;color:#fff}.tv-sc-name{font-size:11px;color:rgba(255,255,255,0.6);font-weight:500}
+.tv-sc-st{font-size:10px;margin-top:1px}.tv-empty{background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.08);border-radius:18px;padding:36px;text-align:center;color:rgba(255,255,255,0.2);font-size:14px}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:26px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:18px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+/* TOAST */
+.toast-wrap{position:fixed;top:16px;right:16px;display:flex;flex-direction:column;gap:7px;z-index:999}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:11px 15px;font-size:13px;color:var(--text);max-width:300px;animation:slideIn .25s ease;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.toast.t-green{border-left:3px solid var(--green)}.toast.t-amber{border-left:3px solid var(--amber)}
+.toast.t-red{border-left:3px solid var(--red)}.toast.t-purple{border-left:3px solid var(--purple)}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+/* RELATÓRIO */
+.rel-periodo{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+.rel-periodo .form-group{margin-bottom:0;flex:1;min-width:140px}
+/* TROCAR SENHA */
+.vend-mobile{max-width:480px;margin:0 auto}
+.vend-card-cliente{background:linear-gradient(135deg,rgba(0,214,126,0.12),rgba(0,214,126,0.04));border:1px solid rgba(0,214,126,0.2);border-radius:var(--radius-lg);padding:22px;margin-bottom:14px}
+.vend-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.vend-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;text-align:center}
+.vend-stat-n{font-size:22px;font-weight:600}.vend-stat-l{font-size:11px;color:var(--text2);margin-top:2px}
+.status-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+/* MOBILE RESPONSIVO */
 @media(max-width:600px){
-  .nav{padding:0 10px}.nav-tab{padding:14px 9px;font-size:12px}
-  .page{padding:12px}.tv-body{grid-template-columns:1fr}.tv-right{display:none}
-  .tv-name{font-size:20px}.tv-num{width:48px;height:48px;font-size:16px}
+  .nav{padding:0 12px}
+  .nav-logo{font-size:14px;padding:12px 12px 12px 0}
+  .nav-tab{padding:14px 10px;font-size:12px}
+  .nav-right{gap:6px}
+  .nav-user{display:none}
+  .page{padding:12px}
+  .card-hdr{padding:11px 14px}
+  .card-body{padding:14px}
+  .tbl th,.tbl td{padding:8px 10px;font-size:12px}
+  .metric{padding:12px}
+  .metric-val{font-size:22px}
+  .vend-mobile{max-width:100%}
+  .vend-card-cliente{padding:16px}
+  .rel-periodo{flex-direction:column}
+  .rel-periodo .form-group{min-width:100%}
+  .tv-body{grid-template-columns:1fr;padding:16px}
+  .tv-right{display:none}
+  .tv-now-name{font-size:22px}
+  .tv-now-num{width:52px;height:52px;font-size:18px}
 }
 </style>
 </head>
@@ -139,290 +145,324 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <div id="tela-login" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">Auto<span>Fila</span></div>
-    <div class="login-sub">Sistema de Atendimento</div>
-    <div class="err-box" id="login-err"></div>
-    <div class="fg"><label class="fl">E-mail</label><input class="fi" type="email" id="li-email" placeholder="seu@email.com"></div>
-    <div class="fg"><label class="fl">Senha</label><input class="fi" type="password" id="li-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
-    <button class="btn btn-p" style="width:100%;padding:11px" id="btn-login" onclick="login()">Entrar</button>
+    <div class="login-sub">Sistema de Atendimento — Loja de Carros</div>
+    <div class="login-err" id="login-err"></div>
+    <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="login-email" placeholder="seu@email.com"></div>
+    <div class="form-group"><label class="form-label">Senha</label><input class="form-input" type="password" id="login-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()"></div>
+    <button class="btn btn-primary" style="width:100%;padding:11px" id="btn-login" onclick="fazerLogin()">Entrar</button>
   </div>
 </div>
 
 <!-- SISTEMA -->
 <div id="sistema" style="display:none">
-  <nav class="nav" id="nav">
+  <nav class="nav" id="main-nav">
     <div class="nav-logo">Auto<span>Fila</span></div>
     <div id="nav-tabs"></div>
     <div class="nav-right">
+      <span class="nav-user" id="nav-user"></span>
       <div class="online-dot"></div>
       <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)" id="nav-clock">--:--</span>
-      <button class="btn btn-sm" id="btn-senha" style="display:none" onclick="openM('m-senha')">🔑 Senha</button>
-      <button class="btn btn-sm" onclick="logout()">Sair</button>
+      <button class="btn btn-sm" id="btn-trocar-senha" style="display:none;background:var(--bg3);border-color:var(--border2)" onclick="openModal('modal-trocar-senha')">🔑 Trocar senha</button>
+      <button class="btn btn-sm" onclick="sair()">Sair</button>
     </div>
   </nav>
-  <div class="toast-wrap" id="toasts"></div>
+  <div class="toast-wrap" id="toast-wrap"></div>
 
   <!-- RECEPÇÃO -->
-  <div class="page" id="p-recepcao">
-    <div class="g2" style="align-items:start">
+  <div class="page" id="page-recepcao">
+    <div class="grid2" style="gap:20px;align-items:start">
       <div>
         <div class="card">
-          <div class="card-hdr"><h3>Novo cliente</h3><span class="badge bg"><span class="dot"></span>Ativo</span></div>
-          <div style="padding:16px">
-            <div class="fg"><label class="fl">Nome</label><input class="fi" type="text" id="r-nome" placeholder="Ex: João da Silva"></div>
-            <div class="fg"><label class="fl">Telefone</label><input class="fi" type="text" id="r-tel" placeholder="(11) 99999-9999"></div>
-            <div class="fg"><label class="fl">Interesse</label>
-              <select class="fs" id="r-int">
+          <div class="card-hdr"><h3>Novo cliente</h3><span class="badge b-green"><span class="badge-dot"></span>Sistema ativo</span></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Nome do cliente</label><input class="form-input" type="text" id="f-nome" placeholder="Ex: João da Silva"></div>
+            <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="text" id="f-tel" placeholder="(11) 99999-9999"></div>
+            <div class="form-group"><label class="form-label">Interesse</label>
+              <select class="form-select" id="f-interesse">
                 <option>Compra — novo</option><option>Compra — seminovo</option>
                 <option>Avaliação de troca</option><option>Financiamento</option><option>Revisão / pós-venda</option>
               </select>
             </div>
-            <div class="fg"><label class="fl">Observação (opcional)</label><input class="fi" type="text" id="r-obs"></div>
-            <button class="btn btn-p" style="width:100%;padding:11px" id="btn-reg" onclick="registrar()">Registrar e distribuir</button>
-            <div id="r-fb" style="display:none;margin-top:12px;padding:14px;background:var(--green-bg);border:1px solid rgba(0,214,126,.2);border-radius:var(--r)">
-              <div style="font-size:11px;color:var(--green);font-weight:600;text-transform:uppercase;margin-bottom:3px">Distribuído!</div>
-              <div style="font-size:15px;font-weight:600" id="r-fb-nome"></div>
-              <div style="font-size:13px;color:var(--text2);margin-top:2px">Vendedor: <strong id="r-fb-vend" style="color:var(--text)"></strong></div>
+            <div class="form-group"><label class="form-label">Observação (opcional)</label><input class="form-input" type="text" id="f-obs" placeholder="Ex: veio indicado por cliente"></div>
+            <button class="btn btn-primary" style="width:100%;padding:11px" id="btn-registrar" onclick="registrarCliente()">Registrar e distribuir na fila</button>
+            <div id="rec-feedback" style="display:none;margin-top:12px;padding:14px;background:var(--green-bg);border:1px solid rgba(0,214,126,0.2);border-radius:var(--radius)">
+              <div style="font-size:11px;color:var(--green);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Cliente distribuído</div>
+              <div style="font-size:15px;font-weight:600" id="rec-nome-cli">—</div>
+              <div style="font-size:13px;color:var(--text2);margin-top:2px">Vendedor: <strong id="rec-vendedor" style="color:var(--text)">—</strong></div>
+              <div style="font-size:11px;color:var(--text3);margin-top:3px" id="rec-criterio"></div>
             </div>
           </div>
         </div>
       </div>
-      <div>
+      <div style="display:flex;flex-direction:column;gap:14px">
         <div class="card">
-          <div class="card-hdr"><h3>Próximos da fila</h3><span class="txt-sm" id="r-count"></span></div>
-          <div id="r-fila"><div class="loading">Carregando...</div></div>
+          <div class="card-hdr"><h3>Próximos da fila</h3><span class="text-sm" id="fila-count">—</span></div>
+          <div id="fila-lista"><div class="loading">Carregando...</div></div>
         </div>
         <div class="card">
-          <div class="card-hdr"><h3>Em atendimento</h3></div>
-          <div id="r-atend"><div class="loading" style="padding:14px">Nenhum</div></div>
+          <div class="card-hdr"><h3>Em atendimento agora</h3></div>
+          <div id="em-atendimento-lista"><div class="loading" style="padding:16px">Nenhum atendimento ativo</div></div>
         </div>
         <div class="card">
-          <div class="card-hdr"><h3>Equipe</h3><button class="btn btn-sm" onclick="openModalStatus(null)">Alterar status</button></div>
-          <div style="padding:14px;display:flex;flex-direction:column;gap:7px" id="r-equipe"></div>
+          <div class="card-hdr"><h3>Status da equipe</h3><button class="btn btn-sm" onclick="openModalStatus(null)">Alterar status</button></div>
+          <div style="padding:14px;display:flex;flex-direction:column;gap:7px" id="equipe-resumo"></div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- VENDEDORES -->
-  <div class="page" id="p-vendedores">
-    <div style="margin-bottom:16px">
-      <div class="sec-title">Equipe de vendas</div>
-      <div style="font-size:18px;font-weight:600" id="v-title">—</div>
-      <div style="font-size:12px;color:var(--text3);margin-top:3px">Adicione vendedores pela aba Usuários</div>
+  <div class="page" id="page-vendedores">
+    <div style="margin-bottom:18px">
+      <div class="section-title">Equipe de vendas</div>
+      <div style="font-size:19px;font-weight:600" id="v-count-title">—</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">Para adicionar vendedores acesse a aba Usuários</div>
     </div>
-    <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap" id="v-filtros">
-      <button class="btn btn-sm" onclick="setFiltro('todos',this)">Todos</button>
-      <button class="btn btn-sm" onclick="setFiltro('disponivel',this)">Disponível</button>
-      <button class="btn btn-sm" onclick="setFiltro('atendendo',this)">Atendendo</button>
-      <button class="btn btn-sm" onclick="setFiltro('indisponivel',this)">Indisponível</button>
-      <button class="btn btn-sm" onclick="setFiltro('ferias',this)">Férias</button>
+    <div style="display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap" id="filtros-vend">
+      <button class="btn btn-sm" id="f-todos" onclick="setFiltro('todos',this)">Todos</button>
+      <button class="btn btn-sm" id="f-disponivel" onclick="setFiltro('disponivel',this)">Disponível</button>
+      <button class="btn btn-sm" id="f-atendendo" onclick="setFiltro('atendendo',this)">Atendendo</button>
+      <button class="btn btn-sm" id="f-indisponivel" onclick="setFiltro('indisponivel',this)">Indisponível</button>
+      <button class="btn btn-sm" id="f-ferias" onclick="setFiltro('ferias',this)">Férias</button>
     </div>
-    <div style="padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;white-space:nowrap">Fila:</span>
-      <div id="v-strip" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    <div style="padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">Ordem da fila:</span>
+      <div id="fila-strip" style="display:flex;gap:6px;flex-wrap:wrap"></div>
     </div>
     <div class="card">
       <table class="tbl">
-        <thead><tr><th>Pos.</th><th>Vendedor</th><th>Status</th><th>Último atend.</th><th>Hoje</th><th>Efetivo</th><th>Ações</th></tr></thead>
-        <tbody id="v-tbody"></tbody>
+        <thead><tr><th>Pos.</th><th>Vendedor</th><th>Status</th><th>Último atend.</th><th>Hoje</th><th>Virtuais</th><th>Efetivo</th><th>Ações</th></tr></thead>
+        <tbody id="tbody-v"><tr><td colspan="8" class="loading">Carregando...</td></tr></tbody>
       </table>
     </div>
   </div>
 
   <!-- GESTÃO -->
-  <div class="page" id="p-gestao">
-    <div class="sec-title" style="margin-bottom:12px">Resumo do dia</div>
-    <div class="g4" style="margin-bottom:18px">
-      <div class="metric"><div class="mv" id="g-total">—</div><div class="ml">Atendidos</div></div>
-      <div class="metric"><div class="mv" id="g-disp">—</div><div class="ml">Disponíveis</div></div>
-      <div class="metric"><div class="mv" id="g-atend">—</div><div class="ml">Em atendimento</div></div>
-      <div class="metric"><div class="mv" id="g-indisp">—</div><div class="ml">Indispon./férias</div></div>
+  <div class="page" id="page-gestao">
+    <div class="section-title" style="margin-bottom:14px">Resumo do dia</div>
+    <div class="grid4" style="margin-bottom:20px">
+      <div class="metric"><div class="metric-val" id="g-total">—</div><div class="metric-lbl">Clientes atendidos</div></div>
+      <div class="metric"><div class="metric-val" id="g-disp">—</div><div class="metric-lbl">Disponíveis agora</div></div>
+      <div class="metric"><div class="metric-val" id="g-atend">—</div><div class="metric-lbl">Em atendimento</div></div>
+      <div class="metric"><div class="metric-val" id="g-indisp">—</div><div class="metric-lbl">Indispon. / férias</div></div>
     </div>
-    <div class="g2" style="gap:16px;align-items:start">
+    <div class="grid2" style="gap:18px;align-items:start">
       <div class="card">
         <div class="card-hdr"><h3>Ranking do dia</h3></div>
-        <table class="tbl"><thead><tr><th>#</th><th>Vendedor</th><th>Atend.</th><th>Vendas</th><th>Status</th></tr></thead>
-        <tbody id="g-rank"></tbody></table>
+        <table class="tbl"><thead><tr><th>#</th><th>Vendedor</th><th>Atendimentos</th><th>Status</th></tr></thead>
+        <tbody id="tbody-rank"></tbody></table>
       </div>
       <div class="card">
-        <div class="card-hdr"><h3>Histórico</h3><span class="txt-sm" id="g-hist-count"></span></div>
-        <div id="g-hist" style="max-height:360px;overflow-y:auto"></div>
+        <div class="card-hdr"><h3>Histórico</h3><span class="text-sm" id="hist-count"></span></div>
+        <div id="hist-body" style="max-height:360px;overflow-y:auto"></div>
       </div>
     </div>
   </div>
 
   <!-- RELATÓRIO -->
-  <div class="page" id="p-relatorio">
-    <div class="sec-title" style="margin-bottom:12px">Relatório por período</div>
-    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
-      <div class="fg" style="margin:0;flex:1;min-width:140px"><label class="fl">Data início</label><input class="fi" type="date" id="rel-ini"></div>
-      <div class="fg" style="margin:0;flex:1;min-width:140px"><label class="fl">Data fim</label><input class="fi" type="date" id="rel-fim"></div>
-      <div class="fg" style="margin:0;flex:1;min-width:160px"><label class="fl">Vendedor</label>
-        <select class="fs" id="rel-vend"><option value="">Todos</option></select>
+  <div class="page" id="page-relatorio">
+    <div class="section-title" style="margin-bottom:14px">Relatório por período</div>
+    <div class="rel-periodo">
+      <div class="form-group"><label class="form-label">Data início</label><input class="form-input" type="date" id="rel-inicio"></div>
+      <div class="form-group"><label class="form-label">Data fim</label><input class="form-input" type="date" id="rel-fim"></div>
+      <div class="form-group"><label class="form-label">Vendedor</label>
+        <select class="form-select" id="rel-vendedor" style="min-width:180px">
+          <option value="">Todos os vendedores</option>
+        </select>
       </div>
-      <button class="btn btn-p" onclick="gerarRel()">Gerar</button>
+      <button class="btn btn-primary" onclick="gerarRelatorio()">Gerar relatório</button>
     </div>
-    <div id="rel-result"></div>
+    <div id="rel-resultado"></div>
   </div>
 
   <!-- USUÁRIOS -->
-  <div class="page" id="p-usuarios">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div><div class="sec-title">Controle de acesso</div><div style="font-size:18px;font-weight:600">Usuários</div></div>
-      <button class="btn btn-p" onclick="openM('m-novo-user')">+ Novo usuário</button>
+  <div class="page" id="page-usuarios">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div><div class="section-title">Controle de acesso</div><div style="font-size:19px;font-weight:600">Usuários do sistema</div></div>
+      <button class="btn btn-primary" onclick="openModalNovoUsuario()">+ Novo usuário</button>
     </div>
     <div class="card">
       <table class="tbl">
-        <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Vendedor</th><th>Ações</th></tr></thead>
-        <tbody id="u-tbody"></tbody>
+        <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Vendedor vinculado</th><th>Ações</th></tr></thead>
+        <tbody id="tbody-usuarios"></tbody>
       </table>
     </div>
   </div>
 
   <!-- VENDEDOR MOBILE -->
-  <div class="page" id="p-vendedor">
-    <div style="max-width:480px;margin:0 auto">
-      <div id="vd-card"></div>
-      <div class="g3" id="vd-stats" style="margin-bottom:12px"></div>
-      <div class="sec-title">Meu status</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-        <button class="sbtn" id="sb-disp" onclick="setMeuStatus('disponivel')">Disponível</button>
-        <button class="sbtn" id="sb-atend" onclick="setMeuStatus('atendendo')">Atendendo</button>
-        <button class="sbtn" id="sb-indisp" onclick="setMeuStatus('indisponivel')">Indisponível</button>
+  <div class="page" id="page-vendedor-mobile">
+    <div class="vend-mobile">
+      <div id="vend-cliente-card"></div>
+      <div class="vend-stats" id="vend-stats"></div>
+      <div class="section-title">Meu status</div>
+      <div class="status-btns" style="margin-bottom:14px">
+        <button class="sbtn" id="sbtn-disp" onclick="mudarStatusVendedor('disponivel')">Disponível</button>
+        <button class="sbtn" id="sbtn-atend" onclick="mudarStatusVendedor('atendendo')">Atendendo</button>
+        <button class="sbtn" id="sbtn-indisp" onclick="mudarStatusVendedor('indisponivel')">Indisponível</button>
       </div>
       <div class="card">
         <div class="card-hdr"><h3>Minha fila do dia</h3></div>
-        <div id="vd-hist"></div>
+        <div id="vend-historico-lista"></div>
       </div>
     </div>
   </div>
 
   <!-- TV -->
-  <div class="page" id="p-tv">
-    <div class="tv">
-      <div class="tv-hdr">
-        <div class="tv-logo">Auto<span>Fila</span></div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="online-dot"></div>
-          <div style="font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,.35)" id="tv-clock">--:--:--</div>
+  <div class="page" id="page-tv">
+    <div class="tv-screen">
+      <div class="tv-header">
+        <div class="tv-logo">Auto<span>Fila</span><span style="font-size:12px;color:rgba(255,255,255,0.2);font-weight:400;margin-left:10px">Sistema de Atendimento</span></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="display:flex;align-items:center;gap:5px"><div class="online-dot"></div><span style="font-size:11px;color:rgba(255,255,255,0.3)">Ao vivo</span></div>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.35)" id="tv-clock">--:--:--</div>
         </div>
       </div>
       <div class="tv-body">
         <div class="tv-left">
-          <div><div class="tv-slbl">Em atendimento agora</div><div id="tv-now"></div></div>
-          <div><div class="tv-slbl">Próximos da fila</div><div class="tv-q" id="tv-q"></div></div>
+          <div><div class="tv-sec-label">Em atendimento agora</div><div id="tv-now"></div></div>
+          <div><div class="tv-sec-label">Próximos da fila</div><div class="tv-queue-card" id="tv-queue"></div></div>
         </div>
         <div class="tv-right">
-          <div><div class="tv-slbl">Equipe hoje</div><div class="tv-tg" id="tv-team"></div></div>
+          <div><div class="tv-sec-label">Equipe hoje</div><div class="tv-team-grid" id="tv-team"></div></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAIS -->
-<div class="modal-wrap" id="m-status">
+<!-- MODAL STATUS -->
+<div class="modal-overlay" id="modal-status">
   <div class="modal"><h3>Alterar status</h3>
-    <div class="fg"><label class="fl">Vendedor</label><select class="fs" id="ms-vend"></select></div>
-    <div class="fg"><label class="fl">Novo status</label>
-      <select class="fs" id="ms-st">
+    <div class="form-group"><label class="form-label">Vendedor</label><select class="form-select" id="ms-vend"></select></div>
+    <div class="form-group"><label class="form-label">Novo status</label>
+      <select class="form-select" id="ms-status">
         <option value="disponivel">Disponível</option><option value="atendendo">Atendendo</option>
-        <option value="indisponivel">Indisponível</option><option value="ferias">Férias</option>
+        <option value="indisponivel">Indisponível</option><option value="ferias">Férias / Afastado</option>
       </select>
     </div>
-    <div class="mf"><button class="btn" onclick="closeM('m-status')">Cancelar</button><button class="btn btn-p" onclick="confirmarStatus()">Confirmar</button></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-status')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarStatus()">Confirmar</button>
+    </div>
   </div>
 </div>
 
-<div class="modal-wrap" id="m-novo-user">
+<!-- MODAL NOVO USUÁRIO -->
+<div class="modal-overlay" id="modal-usuario">
   <div class="modal"><h3>Novo usuário</h3>
-    <div class="fg"><label class="fl">Nome completo</label><input class="fi" type="text" id="nu-nome"></div>
-    <div class="fg"><label class="fl">Telefone</label><input class="fi" type="text" id="nu-tel"></div>
-    <div class="fg"><label class="fl">E-mail (login)</label><input class="fi" type="email" id="nu-email"></div>
-    <div class="fg"><label class="fl">Senha inicial</label><input class="fi" type="text" id="nu-senha" placeholder="Mínimo 6 caracteres"></div>
-    <div class="fg"><label class="fl">Perfil</label>
-      <select class="fs" id="nu-perfil" onchange="toggleAviso()">
-        <option value="vendedor">Vendedor</option><option value="recepcao">Recepcionista</option><option value="admin">Admin</option>
+    <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" id="mu-nome" placeholder="Ex: Carlos Mendes"></div>
+    <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="text" id="mu-tel" placeholder="(11) 99999-9999"></div>
+    <div class="form-group"><label class="form-label">E-mail (login)</label><input class="form-input" type="email" id="mu-email" placeholder="email@loja.com"></div>
+    <div class="form-group"><label class="form-label">Senha inicial</label><input class="form-input" type="text" id="mu-senha" placeholder="Mínimo 6 caracteres"></div>
+    <div class="form-group"><label class="form-label">Perfil</label>
+      <select class="form-select" id="mu-perfil" onchange="toggleCamposVendedor()">
+        <option value="vendedor">Vendedor</option><option value="recepcao">Recepcionista</option><option value="admin">Administrador</option>
       </select>
     </div>
-    <div id="nu-aviso" style="padding:9px 13px;background:var(--blue-bg);border:1px solid rgba(79,158,255,.2);border-radius:var(--r);font-size:12px;color:var(--blue);margin-bottom:12px">
-      Vendedor será cadastrado automaticamente na fila.
+    <div id="mu-aviso" style="display:block;padding:9px 13px;background:var(--blue-bg);border:1px solid rgba(79,158,255,0.2);border-radius:var(--radius);font-size:12px;color:var(--blue);margin-bottom:14px">
+      O vendedor será cadastrado automaticamente na fila com esses dados.
     </div>
-    <div class="mf"><button class="btn" onclick="closeM('m-novo-user')">Cancelar</button><button class="btn btn-p" id="btn-criar" onclick="criarUsuario()">Criar</button></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-usuario')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-criar-usuario" onclick="criarUsuario()">Criar usuário</button>
+    </div>
   </div>
 </div>
 
-<div class="modal-wrap" id="m-edit-user">
+<!-- MODAL EDITAR USUÁRIO -->
+<div class="modal-overlay" id="modal-editar-usuario">
   <div class="modal"><h3>Editar usuário</h3>
-    <input type="hidden" id="eu-id"><input type="hidden" id="eu-vid">
-    <div class="fg"><label class="fl">Nome</label><input class="fi" type="text" id="eu-nome"></div>
-    <div class="fg"><label class="fl">Telefone</label><input class="fi" type="text" id="eu-tel"></div>
-    <div class="fg"><label class="fl">E-mail</label><input class="fi" type="email" id="eu-email"></div>
-    <div class="fg"><label class="fl">Nova senha (deixe em branco para não alterar)</label><input class="fi" type="text" id="eu-senha"></div>
-    <div class="fg"><label class="fl">Perfil</label>
-      <select class="fs" id="eu-perfil"><option value="vendedor">Vendedor</option><option value="recepcao">Recepcionista</option><option value="admin">Admin</option></select>
+    <input type="hidden" id="eu-id"><input type="hidden" id="eu-vendedor-id">
+    <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" id="eu-nome"></div>
+    <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="text" id="eu-tel"></div>
+    <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="eu-email"></div>
+    <div class="form-group"><label class="form-label">Nova senha (deixe em branco para não alterar)</label><input class="form-input" type="text" id="eu-senha" placeholder="Mínimo 6 caracteres"></div>
+    <div class="form-group"><label class="form-label">Perfil</label>
+      <select class="form-select" id="eu-perfil">
+        <option value="vendedor">Vendedor</option><option value="recepcao">Recepcionista</option><option value="admin">Administrador</option>
+      </select>
     </div>
-    <div class="mf"><button class="btn" onclick="closeM('m-edit-user')">Cancelar</button><button class="btn btn-p" id="btn-salvar-eu" onclick="salvarUser()">Salvar</button></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-editar-usuario')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-salvar-usuario" onclick="salvarEdicaoUsuario()">Salvar</button>
+    </div>
   </div>
 </div>
 
-<div class="modal-wrap" id="m-senha">
-  <div class="modal"><h3>Trocar senha</h3>
-    <div class="fg"><label class="fl">Nova senha</label><input class="fi" type="password" id="ns-nova" placeholder="Mínimo 6 caracteres"></div>
-    <div class="fg"><label class="fl">Confirmar</label><input class="fi" type="password" id="ns-conf"></div>
-    <div class="mf"><button class="btn" onclick="closeM('m-senha')">Cancelar</button><button class="btn btn-p" onclick="trocarSenha()">Salvar</button></div>
+<!-- MODAL TROCAR SENHA -->
+<div class="modal-overlay" id="modal-trocar-senha">
+  <div class="modal"><h3>Trocar minha senha</h3>
+    <div class="form-group"><label class="form-label">Nova senha</label><input class="form-input" type="password" id="nova-senha" placeholder="Mínimo 6 caracteres"></div>
+    <div class="form-group"><label class="form-label">Confirmar senha</label><input class="form-input" type="password" id="conf-senha" placeholder="Repita a nova senha"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-trocar-senha')">Cancelar</button>
+      <button class="btn btn-primary" onclick="trocarSenha()">Salvar senha</button>
+    </div>
   </div>
 </div>
 
-<div class="modal-wrap" id="m-excluir">
+<!-- MODAL EXCLUIR -->
+<div class="modal-overlay" id="modal-excluir">
   <div class="modal"><h3>Confirmar exclusão</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px" id="excluir-msg"></p>
-    <div class="mf"><button class="btn" onclick="closeM('m-excluir')">Cancelar</button><button class="btn btn-d" id="btn-excluir-ok">Excluir</button></div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:18px" id="excluir-msg"></p>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-excluir')">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirmar-excluir">Excluir</button>
+    </div>
   </div>
 </div>
 
 <script>
-// ── SUPABASE ──────────────────────────────────────────────────────────────
 const {createClient}=supabase;
 const db=createClient('https://vopgulrbstnguprdizjg.supabase.co','sb_publishable_bRVz1wtI3gZuOCS13DaT8g_RRIZcZOH');
 
-// ── ESTADO ────────────────────────────────────────────────────────────────
-let EU=null; // perfil do usuário logado
-let MEU_VEND=null; // vendedor vinculado (se for vendedor)
-let VS=[],HS=[],USERS=[];
-let FILTRO='todos';
-let TV_ULTIMO=0;
-
-// ── CONSTANTES ────────────────────────────────────────────────────────────
+const SB={disponivel:'b-green',atendendo:'b-amber',indisponivel:'b-gray',ferias:'b-red'};
 const SL={disponivel:'Disponível',atendendo:'Atendendo',indisponivel:'Indisponível',ferias:'Férias'};
-const SB={disponivel:'bg',atendendo:'ba',indisponivel:'bb',ferias:'br'};
-const AVC=['avG','avB','avA','avP','avR'];
+const AVC=['av-green','av-blue','av-amber','av-purple','av-red'];
 const avc=i=>AVC[i%AVC.length];
+
+let VS=[],HS=[],USUARIOS=[],filtro='todos';
+let PERFIL_ATUAL=null,VENDEDOR_ATUAL=null;
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
 const ini=n=>{const p=n.trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();};
 const fmtH=d=>new Date(d).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-const fmtD=d=>new Date(d).toLocaleDateString('pt-BR');
+const fmtData=d=>new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
 function ago(d){
   const m=Math.floor((Date.now()-new Date(d))/60000);
-  if(m<1)return 'Agora';if(m<60)return m+'min';
-  return Math.floor(m/60)+'h'+(m%60>0?m%60+'min':'')+'  atrás';
+  if(m<1)return 'Agora';if(m<60)return m+'min atrás';
+  const h=Math.floor(m/60);return h+'h'+(m%60>0?m%60+'min':'')+ ' atrás';
 }
 
-// ── FILA ──────────────────────────────────────────────────────────────────
-function calcFila(){
+// ── RESET DIÁRIO ──────────────────────────────────────────────────────────
+const STORAGE_KEY='autofila_ultimo_reset';
+async function verificarResetDiario(){
+  const hoje=new Date().toDateString();
+  const ultimo=localStorage.getItem(STORAGE_KEY);
+  if(ultimo!==hoje){
+    await db.from('vendedores').update({atend_hoje:0}).eq('ativo',true);
+    await db.from('historico').update({encerrado:true}).eq('encerrado',false);
+    localStorage.setItem(STORAGE_KEY,hoje);
+    console.log('Reset diário executado');
+  }
+}
+
+// ── LÓGICA DA FILA ────────────────────────────────────────────────────────
+function calcOrdem(){
   return VS.filter(v=>v.status==='disponivel'&&v.ativo).sort((a,b)=>{
     const d=new Date(a.ultimo_atend)-new Date(b.ultimo_atend);
     if(d!==0)return d;
-    const ta=a.atend_hoje+(a.virtual||0),tb=b.atend_hoje+(b.virtual||0);
+    const ta=a.atend_hoje+a.virtual,tb=b.atend_hoje+b.virtual;
     if(ta!==tb)return ta-tb;
     return new Date(a.entrou_as)-new Date(b.entrou_as);
   });
 }
 function critUsado(v,rank,ord){
-  if(rank===0)return 'Critério 1';
+  if(rank===0||!ord[rank-1])return 'Critério 1 — mais tempo sem atender';
   const p=ord[rank-1];
-  if(new Date(p.ultimo_atend)<new Date(v.ultimo_atend))return 'Critério 1';
-  if((p.atend_hoje+(p.virtual||0))<(v.atend_hoje+(v.virtual||0)))return 'Critério 2';
-  return 'Critério 3';
+  if(new Date(p.ultimo_atend)<new Date(v.ultimo_atend))return 'Critério 1 — atendeu mais recente';
+  if((p.atend_hoje+p.virtual)<(v.atend_hoje+v.virtual))return 'Critério 2 — mais atend. efetivos';
+  return 'Critério 3 — entrou depois na fila';
 }
 function calcVirtual(excId){
   const a=VS.filter(v=>v.status!=='ferias'&&v.ativo&&v.id!==excId);
@@ -430,132 +470,65 @@ function calcVirtual(excId){
 }
 
 // ── BANCO ─────────────────────────────────────────────────────────────────
-async function loadVS(){
+async function loadVendedores(){
   const {data}=await db.from('vendedores').select('*').eq('ativo',true).order('id');
-  VS=data||[];
-  // Popular select de vendedor no relatório
-  const sel=document.getElementById('rel-vend');
-  if(sel){sel.innerHTML='<option value="">Todos</option>'+VS.map(v=>`<option value="${v.nome}">${v.nome}</option>`).join('');}
-  renderAll();
+  VS=data||[];popularSelectVendedor();renderAll();
 }
-async function loadHS(){
+async function loadHistorico(){
   const {data}=await db.from('historico').select('*').order('created_at',{ascending:false}).limit(100);
   HS=data||[];
 }
-async function loadUSERS(){
+async function loadUsuarios(){
   const {data}=await db.from('perfis').select('*').order('created_at');
-  USERS=data||[];renderUsers();
+  USUARIOS=data||[];renderUsuarios();
 }
 
-// ── RESET DIÁRIO ──────────────────────────────────────────────────────────
-async function resetDiario(){
-  const hoje=new Date().toDateString();
-  const ultimo=localStorage.getItem('af_reset');
-  if(ultimo!==hoje){
-    await db.from('vendedores').update({atend_hoje:0,vendas_hoje:0}).eq('ativo',true);
-    await db.from('historico').update({encerrado:true}).eq('encerrado',false);
-    localStorage.setItem('af_reset',hoje);
-  }
-}
-
-// ── LOGIN ─────────────────────────────────────────────────────────────────
-async function login(){
-  const email=document.getElementById('li-email').value.trim();
-  const senha=document.getElementById('li-senha').value;
-  const err=document.getElementById('login-err');
-  const btn=document.getElementById('btn-login');
-  err.style.display='none';btn.disabled=true;btn.textContent='Entrando...';
+// ── SOM NOTIFICAÇÃO ───────────────────────────────────────────────────────
+function tocarSom(){
   try{
-    const {data,error}=await db.auth.signInWithPassword({email,password:senha});
-    if(error)throw new Error('E-mail ou senha incorretos');
-    // Buscar perfil SEMPRE fresco do banco
-    const {data:perfil,error:pe}=await db.from('perfis').select('*').eq('id',data.user.id).single();
-    if(pe||!perfil)throw new Error('Perfil não encontrado. Fale com o administrador.');
-    EU=perfil;
-    await iniciar();
-  }catch(e){
-    err.textContent=e.message;err.style.display='block';
-  }
-  btn.disabled=false;btn.textContent='Entrar';
-}
-
-async function logout(){
-  await db.auth.signOut();
-  EU=null;MEU_VEND=null;VS=[];HS=[];USERS=[];
-  document.getElementById('sistema').style.display='none';
-  document.getElementById('tela-login').style.display='flex';
-}
-
-// ── INICIAR ───────────────────────────────────────────────────────────────
-async function iniciar(){
-  document.getElementById('tela-login').style.display='none';
-  document.getElementById('sistema').style.display='block';
-  // Montar abas
-  const tabs=document.getElementById('nav-tabs');tabs.innerHTML='';
-  if(EU.perfil==='vendedor'){
-    addTab('Minha Fila','vendedor');
-    document.getElementById('btn-senha').style.display='inline-flex';
-  }else{
-    addTab('Recepção','recepcao');
-    addTab('Vendedores','vendedores');
-    addTab('Gestão','gestao');
-    addTab('Relatório','relatorio');
-    if(EU.perfil==='admin')addTab('Usuários','usuarios');
-    addTab('TV da Sala','tv');
-  }
-  await resetDiario();
-  await loadVS();
-  await loadHS();
-  if(EU.perfil==='admin')await loadUSERS();
-  // Datas padrão relatório
-  const hoje=new Date().toISOString().split('T')[0];
-  const semana=new Date(Date.now()-7*86400000).toISOString().split('T')[0];
-  const ri=document.getElementById('rel-ini'),rf=document.getElementById('rel-fim');
-  if(ri)ri.value=semana;if(rf)rf.value=hoje;
-  // Vendedor: buscar dados do vendedor vinculado
-  if(EU.perfil==='vendedor'){
-    if(EU.vendedor_id){
-      MEU_VEND=VS.find(v=>v.id===Number(EU.vendedor_id))||null;
-    }
-    renderVendedor();
-  }
-  // Ativar primeira aba
-  tabs.querySelector('.nav-tab')?.click();
-}
-
-function addTab(label,page){
-  const b=document.createElement('button');b.className='nav-tab';b.textContent=label;
-  b.onclick=()=>goPage(page,b);document.getElementById('nav-tabs').appendChild(b);
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [523,659,784].forEach((freq,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=freq;o.type='sine';
+      g.gain.setValueAtTime(0,ctx.currentTime+i*0.15);
+      g.gain.linearRampToValueAtTime(0.3,ctx.currentTime+i*0.15+0.05);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*0.15+0.2);
+      o.start(ctx.currentTime+i*0.15);o.stop(ctx.currentTime+i*0.15+0.25);
+    });
+  }catch(e){}
 }
 
 // ── REGISTRAR CLIENTE ─────────────────────────────────────────────────────
-async function registrar(){
-  const nome=document.getElementById('r-nome').value.trim();
-  const tel=document.getElementById('r-tel').value.trim();
-  const int=document.getElementById('r-int').value;
-  const obs=document.getElementById('r-obs').value.trim();
-  if(!nome){toast('Informe o nome do cliente','tR');return;}
-  const fila=calcFila();
-  if(!fila.length){toast('Nenhum vendedor disponível','tA');return;}
-  const v=fila[0],c=critUsado(v,0,fila),agora=new Date().toISOString();
-  const btn=document.getElementById('btn-reg');
+async function registrarCliente(){
+  const nome=document.getElementById('f-nome').value.trim();
+  const tel=document.getElementById('f-tel').value.trim();
+  const interesse=document.getElementById('f-interesse').value;
+  const obs=document.getElementById('f-obs').value.trim();
+  if(!nome){toast('Informe o nome do cliente','red');return;}
+  const ord=calcOrdem();
+  if(!ord.length){toast('Nenhum vendedor disponível no momento','amber');return;}
+  const v=ord[0],c=critUsado(v,0,ord),agora=new Date().toISOString();
+  const btn=document.getElementById('btn-registrar');
   btn.disabled=true;btn.textContent='Registrando...';
   await db.from('vendedores').update({status:'atendendo',ultimo_atend:agora,atend_hoje:v.atend_hoje+1}).eq('id',v.id);
-  await db.from('clientes').insert({nome,tel,interesse:int,observacao:obs,vendedor_id:v.id,vendedor_nome:v.nome,criterio:c,encerrado:false,vendido:false});
-  await db.from('historico').insert({cliente_nome:nome,interesse:int,vendedor_nome:v.nome,criterio:c,vendedor_id:v.id,encerrado:false,vendido:false});
-  document.getElementById('r-fb-nome').textContent=nome;
-  document.getElementById('r-fb-vend').textContent=v.nome;
-  document.getElementById('r-fb').style.display='block';
-  document.getElementById('r-nome').value='';document.getElementById('r-tel').value='';document.getElementById('r-obs').value='';
-  btn.disabled=false;btn.textContent='Registrar e distribuir';
-  toast('Atribuído a '+v.nome,'tG');
-  await loadVS();await loadHS();
+  await db.from('clientes').insert({nome,tel,interesse,observacao:obs,vendedor_id:v.id,vendedor_nome:v.nome,criterio:c,encerrado:false});
+  await db.from('historico').insert({cliente_nome:nome,interesse,vendedor_nome:v.nome,criterio:c,vendedor_id:v.id,encerrado:false});
+  document.getElementById('rec-nome-cli').textContent=nome;
+  document.getElementById('rec-vendedor').textContent=v.nome;
+  document.getElementById('rec-criterio').textContent=c;
+  document.getElementById('rec-feedback').style.display='block';
+  document.getElementById('f-nome').value='';document.getElementById('f-tel').value='';document.getElementById('f-obs').value='';
+  btn.disabled=false;btn.textContent='Registrar e distribuir na fila';
+  toast('Cliente atribuído a '+v.nome,'green');
+  toast('📱 '+v.nome.split(' ')[0]+' foi notificado','amber');
+  await loadVendedores();await loadHistorico();
 }
 
 // ── STATUS ────────────────────────────────────────────────────────────────
 async function confirmarStatus(){
   const id=parseInt(document.getElementById('ms-vend').value);
-  const ns=document.getElementById('ms-st').value;
+  const ns=document.getElementById('ms-status').value;
   const v=VS.find(x=>x.id===id);if(!v)return;
   const up={status:ns};
   if(ns==='disponivel'||ns==='indisponivel'){
@@ -565,277 +538,312 @@ async function confirmarStatus(){
   }
   if(v.status==='ferias'&&ns==='disponivel'){
     up.virtual=calcVirtual(id);
-    toast(v.nome+' voltou — +'+up.virtual+' virtuais','tP');
+    toast(v.nome+' voltou de férias — +'+up.virtual+' atend. virtuais','purple');
   }
   await db.from('vendedores').update(up).eq('id',id);
-  toast('Status de '+v.nome+' → '+SL[ns],'tA');
-  closeM('m-status');await loadVS();await loadHS();
+  await db.from('log_status').insert({vendedor_id:id,vendedor_nome:v.nome,status_anterior:v.status,status_novo:ns,alterado_por:PERFIL_ATUAL.email});
+  toast('Status de '+v.nome+' → '+SL[ns],'amber');
+  toast('📱 '+v.nome.split(' ')[0]+' foi notificado','green');
+  closeModal('modal-status');
+  await loadVendedores();await loadHistorico();
 }
 
-async function setMeuStatus(ns){
-  if(!MEU_VEND)return;
+async function mudarStatusVendedor(ns){
+  if(!VENDEDOR_ATUAL)return;
   const up={status:ns};
   if(ns==='disponivel'||ns==='indisponivel'){
     if(ns==='disponivel')up.entrou_as=new Date().toISOString();
-    await db.from('historico').update({encerrado:true}).eq('vendedor_id',MEU_VEND.id).eq('encerrado',false);
-    await db.from('clientes').update({encerrado:true}).eq('vendedor_id',MEU_VEND.id).eq('encerrado',false);
+    await db.from('historico').update({encerrado:true}).eq('vendedor_id',VENDEDOR_ATUAL.id).eq('encerrado',false);
+    await db.from('clientes').update({encerrado:true}).eq('vendedor_id',VENDEDOR_ATUAL.id).eq('encerrado',false);
   }
-  await db.from('vendedores').update(up).eq('id',MEU_VEND.id);
-  toast('Status → '+SL[ns],'tG');
-  await loadVS();await loadHS();
-  MEU_VEND=VS.find(v=>v.id===MEU_VEND.id)||null;
-  renderVendedor();
+  await db.from('vendedores').update(up).eq('id',VENDEDOR_ATUAL.id);
+  toast('Status atualizado para '+SL[ns],'green');
+  await loadVendedores();await loadHistorico();
+  VENDEDOR_ATUAL=VS.find(v=>v.id===VENDEDOR_ATUAL.id)||null;
+  renderVendedorMobile();
 }
 
-async function marcarVendido(hid){
-  if(!MEU_VEND)return;
-  await db.from('historico').update({vendido:true}).eq('id',hid);
-  await db.from('clientes').update({vendido:true}).eq('vendedor_id',MEU_VEND.id).eq('encerrado',false);
-  const vAtual=VS.find(v=>v.id===MEU_VEND.id);
-  if(vAtual)await db.from('vendedores').update({vendas_hoje:(vAtual.vendas_hoje||0)+1}).eq('id',MEU_VEND.id);
-  toast('Venda registrada!','tG');
-  await loadVS();await loadHS();
-  MEU_VEND=VS.find(v=>v.id===MEU_VEND.id)||null;
-  renderVendedor();
+// ── MARCAR VENDIDO ────────────────────────────────────────────────────────
+async function marcarVendido(historicoId){
+  await db.from('historico').update({vendido:true}).eq('id',historicoId);
+  await db.from('clientes').update({vendido:true}).eq('vendedor_id',VENDEDOR_ATUAL.id).eq('encerrado',false);
+  // Incrementar contador de vendas no vendedor
+  const v=VENDEDOR_ATUAL;
+  await db.from('vendedores').update({vendas_hoje:(v.vendas_hoje||0)+1}).eq('id',v.id);
+  toast('Venda registrada!','green');
+  await loadVendedores();await loadHistorico();
+  VENDEDOR_ATUAL=VS.find(x=>x.id===v.id)||null;
+  renderVendedorMobile();
+}
+async function trocarSenha(){
+  const nova=document.getElementById('nova-senha').value;
+  const conf=document.getElementById('conf-senha').value;
+  if(!nova||nova.length<6){toast('Senha deve ter pelo menos 6 caracteres','red');return;}
+  if(nova!==conf){toast('As senhas não coincidem','red');return;}
+  try{
+    await db.rpc('trocar_senha',{user_id:PERFIL_ATUAL.id,nova_senha:nova});
+    toast('Senha alterada com sucesso!','green');
+    document.getElementById('nova-senha').value='';
+    document.getElementById('conf-senha').value='';
+    closeModal('modal-trocar-senha');
+  }catch(e){toast('Erro ao trocar senha: '+e.message,'red');}
 }
 
 // ── CRIAR USUÁRIO ─────────────────────────────────────────────────────────
 async function criarUsuario(){
-  const nome=document.getElementById('nu-nome').value.trim();
-  const tel=document.getElementById('nu-tel').value.trim();
-  const email=document.getElementById('nu-email').value.trim();
-  const senha=document.getElementById('nu-senha').value;
-  const perfil=document.getElementById('nu-perfil').value;
-  if(!nome||!email||!senha){toast('Preencha todos os campos','tR');return;}
-  if(senha.length<6){toast('Senha mínimo 6 caracteres','tR');return;}
-  const btn=document.getElementById('btn-criar');btn.disabled=true;btn.textContent='Criando...';
+  const nome=document.getElementById('mu-nome').value.trim();
+  const tel=document.getElementById('mu-tel').value.trim();
+  const email=document.getElementById('mu-email').value.trim();
+  const senha=document.getElementById('mu-senha').value;
+  const perfil=document.getElementById('mu-perfil').value;
+  if(!nome||!email||!senha){toast('Preencha nome, e-mail e senha','red');return;}
+  if(senha.length<6){toast('Senha deve ter pelo menos 6 caracteres','red');return;}
+  const btn=document.getElementById('btn-criar-usuario');
+  btn.disabled=true;btn.textContent='Criando...';
   try{
-    // 1. Criar vendedor na fila se necessário
     let vendedorId=null;
     if(perfil==='vendedor'){
       const {data:vd,error:ve}=await db.from('vendedores').insert({
         nome,tel,email,status:'disponivel',
         ultimo_atend:new Date(Date.now()-99999999).toISOString(),
-        atend_hoje:0,virtual:0,vendas_hoje:0,
-        entrou_as:new Date().toISOString(),ativo:true
+        atend_hoje:0,virtual:0,entrou_as:new Date().toISOString(),ativo:true
       }).select().single();
       if(ve)throw new Error('Erro ao criar vendedor: '+ve.message);
       vendedorId=vd.id;
     }
-    // 2. Criar usuário
-    const {data:auth,error:ae}=await db.auth.signUp({
-      email,
-      password:senha,
-      options:{
-        data:{nome},
-        emailRedirectTo: window.location.origin
-      }
-    });
-    let userId=null;
-    if(ae){
-      toast('Erro: '+ae.message,'tR');
-      if(vendedorId)await db.from('vendedores').update({ativo:false}).eq('id',vendedorId);
-      btn.disabled=false;btn.textContent='Criar';return;
-    }
-    // Se identities vazio = email já existe
-    if(auth?.user?.identities?.length===0){
-      toast('E-mail já cadastrado no sistema','tR');
-      if(vendedorId)await db.from('vendedores').update({ativo:false}).eq('id',vendedorId);
-      btn.disabled=false;btn.textContent='Criar';return;
-    }
-    userId=auth?.user?.id;
-    if(!userId)throw new Error('Usuário não criado');
-    // 3. Definir senha corretamente
-    await db.rpc('trocar_senha',{user_id:userId,nova_senha:senha}).catch(()=>{});
-    // 4. Criar perfil vinculado
-    const {error:pe}=await db.from('perfis').insert({id:userId,email,nome,perfil,vendedor_id:vendedorId});
-    if(pe)throw new Error('Erro ao criar perfil: '+pe.message);
-    toast(nome+' criado com sucesso!','tG');
-    closeM('m-novo-user');
-    ['nu-nome','nu-tel','nu-email','nu-senha'].forEach(i=>document.getElementById(i).value='');
-    await loadVS();await loadUSERS();
-  }catch(e){toast(e.message,'tR');}
-  btn.disabled=false;btn.textContent='Criar';
+    const {data:authData,error:authErr}=await db.auth.signUp({email,password:senha,options:{data:{nome}}});
+    if(authErr)throw new Error('Erro ao criar login: '+authErr.message);
+    if(!authData?.user)throw new Error('Usuário não foi criado');
+    // Confirmar e-mail e definir senha corretamente
+    await db.rpc('trocar_senha',{user_id:authData.user.id,nova_senha:senha}).catch(()=>{});
+    await db.from('perfis').insert({id:authData.user.id,email,nome,perfil,vendedor_id:vendedorId});
+    toast(nome+' criado com sucesso!','green');
+    if(perfil==='vendedor')toast('Vendedor adicionado à fila','green');
+    closeModal('modal-usuario');
+    await loadVendedores();await loadUsuarios();
+  }catch(e){toast(e.message,'red');}
+  btn.disabled=false;btn.textContent='Criar usuário';
 }
 
 // ── EDITAR USUÁRIO ────────────────────────────────────────────────────────
-function openEditUser(id){
-  const u=USERS.find(x=>x.id===id);if(!u)return;
+function openModalEditarUsuario(id){
+  const u=USUARIOS.find(x=>x.id===id);if(!u)return;
   const v=VS.find(x=>x.id===u.vendedor_id);
   document.getElementById('eu-id').value=u.id;
-  document.getElementById('eu-vid').value=u.vendedor_id||'';
+  document.getElementById('eu-vendedor-id').value=u.vendedor_id||'';
   document.getElementById('eu-nome').value=u.nome;
   document.getElementById('eu-tel').value=v?v.tel||'':'';
   document.getElementById('eu-email').value=u.email;
   document.getElementById('eu-senha').value='';
   document.getElementById('eu-perfil').value=u.perfil;
-  openM('m-edit-user');
+  openModal('modal-editar-usuario');
 }
-async function salvarUser(){
+async function salvarEdicaoUsuario(){
   const id=document.getElementById('eu-id').value;
-  const vid=document.getElementById('eu-vid').value;
+  const vendedorId=document.getElementById('eu-vendedor-id').value;
   const nome=document.getElementById('eu-nome').value.trim();
   const tel=document.getElementById('eu-tel').value.trim();
   const email=document.getElementById('eu-email').value.trim();
   const senha=document.getElementById('eu-senha').value;
   const perfil=document.getElementById('eu-perfil').value;
-  if(!nome||!email){toast('Nome e e-mail obrigatórios','tR');return;}
-  const btn=document.getElementById('btn-salvar-eu');btn.disabled=true;btn.textContent='Salvando...';
+  if(!nome||!email){toast('Nome e e-mail são obrigatórios','red');return;}
+  const btn=document.getElementById('btn-salvar-usuario');
+  btn.disabled=true;btn.textContent='Salvando...';
   try{
     await db.from('perfis').update({nome,email,perfil}).eq('id',id);
-    if(vid)await db.from('vendedores').update({nome,tel,email}).eq('id',parseInt(vid));
+    if(vendedorId)await db.from('vendedores').update({nome,tel,email}).eq('id',parseInt(vendedorId));
     if(senha&&senha.length>=6){
       await db.rpc('trocar_senha',{user_id:id,nova_senha:senha});
-      toast('Senha atualizada','tG');
+      toast('Senha atualizada','green');
     }
-    toast(nome+' atualizado','tG');closeM('m-edit-user');
-    await loadVS();await loadUSERS();
-  }catch(e){toast('Erro: '+e.message,'tR');}
+    toast('Usuário '+nome+' atualizado','green');
+    closeModal('modal-editar-usuario');
+    await loadVendedores();await loadUsuarios();
+  }catch(e){toast('Erro: '+e.message,'red');}
   btn.disabled=false;btn.textContent='Salvar';
 }
 
 // ── EXCLUIR ───────────────────────────────────────────────────────────────
 function confirmarExcluir(msg,fn){
   document.getElementById('excluir-msg').textContent=msg;
-  document.getElementById('btn-excluir-ok').onclick=async()=>{await fn();closeM('m-excluir');};
-  openM('m-excluir');
+  document.getElementById('btn-confirmar-excluir').onclick=async()=>{await fn();closeModal('modal-excluir');};
+  openModal('modal-excluir');
 }
-async function excluirUser(id,nome){
-  confirmarExcluir('Excluir "'+nome+'" completamente?',async()=>{
+async function excluirVendedor(id,nome){
+  confirmarExcluir('Remover vendedor "'+nome+'"? O acesso, histórico e login serão removidos.',async()=>{
+    const {data:perfil}=await db.from('perfis').select('id').eq('vendedor_id',id).single();
+    await db.from('historico').delete().eq('vendedor_id',id);
+    await db.from('historico').delete().eq('vendedor_nome',nome);
+    await db.from('clientes').delete().eq('vendedor_id',id);
+    await db.from('clientes').delete().eq('vendedor_nome',nome);
+    await db.from('vendedores').update({ativo:false}).eq('id',id);
+    if(perfil){await db.from('perfis').delete().eq('id',perfil.id);await db.rpc('delete_user',{user_id:perfil.id});}
+    toast(nome+' removido completamente','green');
+    await loadVendedores();await loadHistorico();await loadUsuarios();
+  });
+}
+async function excluirUsuario(id,nome){
+  confirmarExcluir('Excluir usuário "'+nome+'" completamente?',async()=>{
     try{
-      const {data:p}=await db.from('perfis').select('*').eq('id',id).single();
-      if(p?.vendedor_id){
-        const {data:vnd}=await db.from('vendedores').select('nome').eq('id',p.vendedor_id).single();
-        if(vnd){
-          await db.from('historico').delete().eq('vendedor_id',p.vendedor_id);
-          await db.from('historico').delete().eq('vendedor_nome',vnd.nome);
-          await db.from('clientes').delete().eq('vendedor_id',p.vendedor_id);
-        }
-        await db.from('vendedores').update({ativo:false}).eq('id',p.vendedor_id);
+      const {data:perfil}=await db.from('perfis').select('*').eq('id',id).single();
+      if(perfil?.vendedor_id){
+        const {data:vend}=await db.from('vendedores').select('nome').eq('id',perfil.vendedor_id).single();
+        const nv=vend?.nome||'';
+        await db.from('historico').delete().eq('vendedor_id',perfil.vendedor_id);
+        if(nv){await db.from('historico').delete().eq('vendedor_nome',nv);await db.from('clientes').delete().eq('vendedor_nome',nv);}
+        await db.from('clientes').delete().eq('vendedor_id',perfil.vendedor_id);
+        await db.from('vendedores').update({ativo:false}).eq('id',perfil.vendedor_id);
       }
       await db.from('perfis').delete().eq('id',id);
       await db.rpc('delete_user',{user_id:id});
-      toast(nome+' removido','tG');
-      await loadVS();await loadHS();await loadUSERS();
-    }catch(e){toast('Erro: '+e.message,'tR');}
+      toast(nome+' removido completamente','green');
+      await loadVendedores();await loadHistorico();await loadUsuarios();
+    }catch(e){toast('Erro: '+e.message,'red');}
   });
 }
-
-// ── TROCAR SENHA ──────────────────────────────────────────────────────────
-async function trocarSenha(){
-  const nova=document.getElementById('ns-nova').value;
-  const conf=document.getElementById('ns-conf').value;
-  if(!nova||nova.length<6){toast('Mínimo 6 caracteres','tR');return;}
-  if(nova!==conf){toast('Senhas não coincidem','tR');return;}
-  try{
-    await db.rpc('trocar_senha',{user_id:EU.id,nova_senha:nova});
-    toast('Senha alterada!','tG');
-    document.getElementById('ns-nova').value='';document.getElementById('ns-conf').value='';
-    closeM('m-senha');
-  }catch(e){toast('Erro: '+e.message,'tR');}
+async function excluirHistorico(id,clienteNome){
+  confirmarExcluir('Excluir atendimento de "'+clienteNome+'" do histórico?',async()=>{
+    await db.from('historico').delete().eq('id',id);
+    toast('Registro excluído','green');await loadHistorico();renderGestao();
+  });
 }
 
 // ── RELATÓRIO ─────────────────────────────────────────────────────────────
-async function gerarRel(){
-  const ini=document.getElementById('rel-ini').value;
+async function gerarRelatorio(){
+  const ini=document.getElementById('rel-inicio').value;
   const fim=document.getElementById('rel-fim').value;
-  const vend=document.getElementById('rel-vend').value;
-  if(!ini||!fim){toast('Selecione o período','tR');return;}
-  let q=db.from('historico').select('*').gte('created_at',ini+'T00:00:00').lte('created_at',fim+'T23:59:59').order('created_at',{ascending:false});
-  if(vend)q=q.eq('vendedor_nome',vend);
-  const {data}=await q;
-  const regs=data||[];
-  if(!regs.length){document.getElementById('rel-result').innerHTML='<div class="loading">Nenhum atendimento no período</div>';return;}
-  const pv={};
-  regs.forEach(r=>{
-    if(!pv[r.vendedor_nome])pv[r.vendedor_nome]={t:0,v:0};
-    pv[r.vendedor_nome].t++;if(r.vendido)pv[r.vendedor_nome].v++;
+  const vendFiltro=document.getElementById('rel-vendedor').value;
+  if(!ini||!fim){toast('Selecione o período','red');return;}
+  let query=db.from('historico').select('*')
+    .gte('created_at',ini+'T00:00:00').lte('created_at',fim+'T23:59:59')
+    .order('created_at',{ascending:false});
+  if(vendFiltro)query=query.eq('vendedor_nome',vendFiltro);
+  const {data}=await query;
+  const registros=data||[];
+  if(!registros.length){
+    document.getElementById('rel-resultado').innerHTML='<div class="loading">Nenhum atendimento no período selecionado</div>';
+    return;
+  }
+  const porVend={};
+  registros.forEach(r=>{
+    if(!porVend[r.vendedor_nome])porVend[r.vendedor_nome]={total:0,vendas:0};
+    porVend[r.vendedor_nome].total++;
+    if(r.vendido)porVend[r.vendedor_nome].vendas++;
   });
-  const rank=Object.entries(pv).sort((a,b)=>b[1].t-a[1].t);
-  const tv=regs.filter(r=>r.vendido).length;
-  document.getElementById('rel-result').innerHTML=`
-    <div class="g4" style="gap:10px;margin-bottom:14px">
-      <div class="metric"><div class="mv">${regs.length}</div><div class="ml">Atendimentos</div></div>
-      <div class="metric"><div class="mv" style="color:var(--green)">${tv}</div><div class="ml">Vendas</div></div>
-      <div class="metric"><div class="mv">${rank.length}</div><div class="ml">Vendedores</div></div>
-      <div class="metric"><div class="mv">${regs.length>0?Math.round(tv/regs.length*100):0}%</div><div class="ml">Conversão</div></div>
+  const ranking=Object.entries(porVend).sort((a,b)=>b[1].total-a[1].total);
+  const totalVendas=registros.filter(r=>r.vendido).length;
+  document.getElementById('rel-resultado').innerHTML=`
+    <div class="grid${vendFiltro?'3':'4'}" style="gap:12px;margin-bottom:16px">
+      <div class="metric"><div class="metric-val">${registros.length}</div><div class="metric-lbl">Atendimentos</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--green)">${totalVendas}</div><div class="metric-lbl">Vendas realizadas</div></div>
+      ${!vendFiltro?`<div class="metric"><div class="metric-val">${ranking.length}</div><div class="metric-lbl">Vendedores ativos</div></div>`:''}
+      <div class="metric"><div class="metric-val">${registros.length>0?Math.round(totalVendas/registros.length*100):0}%</div><div class="metric-lbl">Taxa de conversão</div></div>
     </div>
-    ${!vend?`<div class="card" style="margin-bottom:14px">
-      <div class="card-hdr"><h3>Ranking</h3></div>
-      <table class="tbl"><thead><tr><th>#</th><th>Vendedor</th><th>Atend.</th><th>Vendas</th><th>Conv.</th></tr></thead>
-      <tbody>${rank.map(([n,d],i)=>`<tr><td><strong>${i+1}</strong></td><td>${n}</td><td>${d.t}</td><td style="color:var(--green)">${d.v}</td><td>${d.t>0?Math.round(d.v/d.t*100):0}%</td></tr>`).join('')}</tbody></table>
+    ${!vendFiltro?`<div class="card" style="margin-bottom:16px">
+      <div class="card-hdr"><h3>Ranking de atendimentos e vendas</h3></div>
+      <table class="tbl"><thead><tr><th>#</th><th>Vendedor</th><th>Atendimentos</th><th>Vendas</th><th>Conversão</th></tr></thead>
+      <tbody>${ranking.map(([nome,d],i)=>`<tr>
+        <td><strong>${i+1}</strong></td><td>${nome}</td>
+        <td style="font-weight:500">${d.total}</td>
+        <td style="font-weight:500;color:var(--green)">${d.vendas}</td>
+        <td style="color:var(--text2)">${d.total>0?Math.round(d.vendas/d.total*100):0}%</td>
+      </tr>`).join('')}</tbody></table>
     </div>`:''}
     <div class="card">
-      <div class="card-hdr"><h3>Histórico</h3><span class="txt-sm">${regs.length} registros</span></div>
-      <div style="max-height:400px;overflow-y:auto">${regs.map(h=>`
-        <div style="display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center">
-          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:85px">${fmtD(h.created_at)} ${fmtH(h.created_at)}</div>
-          <div style="flex:1"><div style="font-size:13px"><strong>${h.cliente_nome}</strong>${!vend?' → '+h.vendedor_nome:''}</div>
-          <div class="txt-sm">${h.interesse}</div></div>
-          ${h.vendido?'<span class="badge bg"><span class="dot"></span>Vendido</span>':''}
-        </div>`).join('')}</div>
+      <div class="card-hdr"><h3>Histórico${vendFiltro?' — '+vendFiltro:''}</h3><span class="text-sm">${registros.length} registros</span></div>
+      <div style="max-height:400px;overflow-y:auto">${registros.map(h=>`
+        <div style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center">
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:90px">${new Date(h.created_at).toLocaleDateString('pt-BR')} ${fmtH(h.created_at)}</div>
+          <div style="flex:1"><div style="font-size:13px"><strong>${h.cliente_nome}</strong>${!vendFiltro?' → '+h.vendedor_nome:''}</div>
+          <div class="text-sm">${h.interesse}</div></div>
+          ${h.vendido?'<span class="badge b-green"><span class="badge-dot"></span>Vendido</span>':''}
+        </div>`).join('')}
+      </div>
     </div>`;
 }
 
+function popularSelectVendedor(){
+  const sel=document.getElementById('rel-vendedor');
+  if(!sel)return;
+  const atual=sel.value;
+  sel.innerHTML='<option value="">Todos os vendedores</option>'+
+    VS.map(v=>`<option value="${v.nome}" ${v.nome===atual?'selected':''}>${v.nome}</option>`).join('');
+}
 // ── RENDERS ───────────────────────────────────────────────────────────────
 function renderAll(){
-  if(EU?.perfil==='vendedor'){renderVendedor();return;}
+  if(PERFIL_ATUAL?.perfil==='vendedor'){renderVendedorMobile();return;}
   renderRec();renderVend();renderGestao();renderTV();
 }
 
 function renderRec(){
-  const fila=calcFila();
-  document.getElementById('r-count').textContent=fila.length+' disponível'+(fila.length!==1?'is':'');
-  // Fila
-  const fe=document.getElementById('r-fila');
-  fe.innerHTML=!fila.length?'<div class="loading">Nenhum disponível</div>':fila.slice(0,5).map((v,i)=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)${i===0?';background:rgba(0,214,126,.03)':''}">
-      <div class="pos ${i===0?'p1':i===1?'p2':i===2?'p3':'pN'}">${i+1}º</div>
-      <div class="av ${avc(v.id)}">${ini(v.nome)}</div>
+  const ord=calcOrdem();
+  document.getElementById('fila-count').textContent=ord.length+' disponível'+(ord.length!==1?'is':'');
+  const fl=document.getElementById('fila-lista');
+  if(!ord.length){fl.innerHTML='<div class="loading">Nenhum vendedor disponível</div>';}
+  else{fl.innerHTML=ord.slice(0,5).map((v,i)=>{
+    const pc=i===0?'pos-1':i===1?'pos-2':i===2?'pos-3':'pos-n';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)${i===0?';background:rgba(0,214,126,0.03)':''}">
+      <div class="pos-badge ${pc}">${i+1}º</div>
+      <div class="avatar ${avc(v.id)}">${ini(v.nome)}</div>
       <div style="flex:1"><div style="font-size:13px;font-weight:${i===0?600:400};color:${i===0?'var(--green)':'var(--text)'}">${v.nome}</div>
-      <div class="txt-sm">${ago(v.ultimo_atend)} · ${v.atend_hoje+(v.virtual||0)} efetivos</div></div>
-      ${i===0?'<span class="badge bg"><span class="dot"></span>Próximo</span>':''}
-    </div>`).join('');
-  // Em atendimento
-  const ea=document.getElementById('r-atend');
-  const ativos=HS.filter(h=>!h.encerrado&&VS.find(v=>v.id===h.vendedor_id&&v.status==='atendendo'));
-  ea.innerHTML=!ativos.length?'<div class="loading" style="padding:14px">Nenhum atendimento ativo</div>':ativos.map(h=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
-      <div class="av avA">${ini(h.vendedor_nome)}</div>
-      <div style="flex:1"><div style="font-size:13px;font-weight:500">${h.cliente_nome}</div>
-      <div class="txt-sm">${h.vendedor_nome} · ${h.interesse}</div></div>
-      <span class="badge ba"><span class="dot"></span>Atendendo</span>
-    </div>`).join('');
-  // Equipe
+      <div class="text-sm">${ago(v.ultimo_atend)} · ${v.atend_hoje+v.virtual} efetivos</div></div>
+      ${i===0?'<span class="badge b-green"><span class="badge-dot"></span>Próximo</span>':''}
+    </div>`;
+  }).join('');}
+
+  // Em atendimento agora
+  const emAtend=VS.filter(v=>v.status==='atendendo');
+  const eatEl=document.getElementById('em-atendimento-lista');
+  if(!emAtend.length){eatEl.innerHTML='<div class="loading" style="padding:14px">Nenhum atendimento ativo</div>';}
+  else{
+    const ativos=HS.filter(h=>!h.encerrado&&emAtend.find(v=>v.id===h.vendedor_id));
+    eatEl.innerHTML=ativos.length?ativos.map(h=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
+        <div class="avatar av-amber">${ini(h.vendedor_nome)}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500">${h.cliente_nome}</div>
+        <div class="text-sm">${h.vendedor_nome} · ${h.interesse} · ${fmtH(h.created_at)}</div></div>
+        <span class="badge b-amber"><span class="badge-dot"></span>Atendendo</span>
+      </div>`).join('')
+    :emAtend.map(v=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
+        <div class="avatar av-amber">${ini(v.nome)}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500">${v.nome}</div>
+        <div class="text-sm">Em atendimento</div></div>
+        <span class="badge b-amber"><span class="badge-dot"></span>Atendendo</span>
+      </div>`).join('');
+  }
+
   const g={disponivel:[],atendendo:[],indisponivel:[],ferias:[]};
   VS.forEach(v=>g[v.status]&&g[v.status].push(v));
-  document.getElementById('r-equipe').innerHTML=Object.entries(g).map(([s,l])=>
+  document.getElementById('equipe-resumo').innerHTML=Object.entries(g).map(([s,l])=>
     `<div style="display:flex;align-items:center;justify-content:space-between">
-      <span class="badge ${SB[s]}"><span class="dot"></span>${SL[s]}</span>
+      <span class="badge ${SB[s]}"><span class="badge-dot"></span>${SL[s]}</span>
       <span style="font-size:13px;font-weight:500">${l.length}</span>
     </div>`).join('');
 }
 
 function renderVend(){
-  const fila=calcFila();const pm={};fila.forEach((v,i)=>pm[v.id]=i);
-  const lista=VS.filter(v=>FILTRO==='todos'||v.status===FILTRO).sort((a,b)=>(pm[a.id]??999)-(pm[b.id]??999)||a.nome.localeCompare(b.nome));
-  document.getElementById('v-title').textContent=VS.length+' vendedores';
-  document.getElementById('v-strip').innerHTML=fila.slice(0,8).map((v,i)=>
-    `<span style="padding:3px 9px;border-radius:6px;font-size:12px;background:${i===0?'var(--green-bg)':'var(--bg3)'};color:${i===0?'var(--green)':'var(--text2)'};border:1px solid ${i===0?'rgba(0,214,126,.2)':'var(--border)'}">${i===0?'→ ':''}${i+1}. ${v.nome.split(' ')[0]}</span>`
-  ).join('')||'<span class="txt-sm">Nenhum disponível</span>';
-  document.getElementById('v-tbody').innerHTML=lista.map(v=>{
+  const ord=calcOrdem();const pm={};ord.forEach((v,i)=>pm[v.id]=i);
+  const lista=VS.filter(v=>filtro==='todos'||v.status===filtro).sort((a,b)=>(pm[a.id]??999)-(pm[b.id]??999)||a.nome.localeCompare(b.nome));
+  document.getElementById('v-count-title').textContent=VS.length+' vendedores';
+  document.getElementById('fila-strip').innerHTML=ord.slice(0,8).map((v,i)=>
+    `<span style="padding:3px 10px;border-radius:6px;font-size:12px;background:${i===0?'var(--green-bg)':'var(--bg3)'};color:${i===0?'var(--green)':'var(--text2)'};border:1px solid ${i===0?'rgba(0,214,126,0.2)':'var(--border)'}">${i===0?'→ ':''}${i+1}. ${v.nome.split(' ')[0]}</span>`
+  ).join('')||'<span class="text-sm">Nenhum disponível</span>';
+  document.getElementById('tbody-v').innerHTML=lista.map(v=>{
     const r=pm[v.id];const n=r===0;
-    return `<tr class="${n?'hl':''}">
-      <td>${v.status==='disponivel'?`<div class="pos ${r===0?'p1':r===1?'p2':r===2?'p3':'pN'}">${r+1}º</div>`:'<div class="pos pN">—</div>'}</td>
-      <td><div style="display:flex;align-items:center;gap:9px"><div class="av ${avc(v.id)}">${ini(v.nome)}</div>
-        <div><div style="font-size:13px;font-weight:500">${v.nome}</div><div class="txt-sm">${v.email||''}</div></div></div></td>
-      <td><span class="badge ${SB[v.status]}"><span class="dot"></span>${SL[v.status]}</span></td>
-      <td class="txt-sm">${ago(v.ultimo_atend)}</td>
+    const pc=r===0?'pos-1':r===1?'pos-2':r===2?'pos-3':'pos-n';
+    return `<tr class="${n?'row-next':''}">
+      <td>${v.status==='disponivel'?`<div class="pos-badge ${pc}">${r+1}º</div>`:'<div class="pos-badge pos-n">—</div>'}</td>
+      <td><div style="display:flex;align-items:center;gap:9px"><div class="avatar ${avc(v.id)}">${ini(v.nome)}</div>
+        <div><div style="font-size:13px;font-weight:500;color:${v.virtual>0?'var(--purple)':'var(--text)'}">${v.nome}${v.virtual>0?' ★':''}</div>
+        <div class="text-sm">${v.email||''}</div></div></div></td>
+      <td><span class="badge ${SB[v.status]}"><span class="badge-dot"></span>${SL[v.status]}</span></td>
+      <td class="text-sm">${ago(v.ultimo_atend)}</td>
       <td style="text-align:center;font-family:'DM Mono',monospace">${v.atend_hoje}</td>
-      <td style="font-weight:500;font-family:'DM Mono',monospace">${v.atend_hoje+(v.virtual||0)}</td>
+      <td>${v.virtual>0?`<span class="badge b-purple">+${v.virtual}</span>`:'<span class="text-sm">—</span>'}</td>
+      <td style="font-weight:500;font-family:'DM Mono',monospace">${v.atend_hoje+v.virtual}</td>
       <td><div style="display:flex;gap:5px">
         <button class="btn btn-sm" onclick="openModalStatus(${v.id})">Status</button>
-        <button class="btn btn-sm btn-d" onclick="excluirUser(null,null,${v.id},'${v.nome.replace(/'/g,"\\'")}')">Remover</button>
+        <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${v.id},'${v.nome.replace(/'/g,"\\'")}')">Remover</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -846,217 +854,225 @@ function renderGestao(){
   document.getElementById('g-disp').textContent=VS.filter(v=>v.status==='disponivel').length;
   document.getElementById('g-atend').textContent=VS.filter(v=>v.status==='atendendo').length;
   document.getElementById('g-indisp').textContent=VS.filter(v=>v.status==='indisponivel'||v.status==='ferias').length;
-  document.getElementById('g-rank').innerHTML=VS.slice().sort((a,b)=>b.atend_hoje-a.atend_hoje).slice(0,10).map((v,i)=>
+  document.getElementById('tbody-rank').innerHTML=VS.slice().sort((a,b)=>b.atend_hoje-a.atend_hoje).slice(0,10).map((v,i)=>
     `<tr><td><strong>${i+1}</strong></td>
-    <td><div style="display:flex;align-items:center;gap:8px"><div class="av ${avc(v.id)}" style="width:26px;height:26px;font-size:11px">${ini(v.nome)}</div><span>${v.nome}</span></div></td>
-    <td style="font-family:'DM Mono',monospace">${v.atend_hoje}</td>
-    <td style="font-family:'DM Mono',monospace;color:var(--green)">${v.vendas_hoje||0}</td>
-    <td><span class="badge ${SB[v.status]}"><span class="dot"></span>${SL[v.status]}</span></td></tr>`
+    <td><div style="display:flex;align-items:center;gap:7px"><div class="avatar ${avc(v.id)}" style="width:26px;height:26px;font-size:11px">${ini(v.nome)}</div><span>${v.nome}</span></div></td>
+    <td style="font-family:'DM Mono',monospace;font-weight:500">${v.atend_hoje}</td>
+    <td><span class="badge ${SB[v.status]}"><span class="badge-dot"></span>${SL[v.status]}</span></td></tr>`
   ).join('');
-  document.getElementById('g-hist-count').textContent=HS.length+' registros';
-  document.getElementById('g-hist').innerHTML=!HS.length?'<div class="loading">Nenhum atendimento</div>':HS.map(h=>`
-    <div style="display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:38px">${fmtH(h.created_at)}</div>
-      <div style="flex:1"><div style="font-size:13px"><strong>${h.cliente_nome}</strong> → ${h.vendedor_nome}</div>
-      <div class="txt-sm">${h.interesse}</div></div>
-      ${h.vendido?'<span class="badge bg" style="font-size:10px">Vendido</span>':''}
-      <button class="btn btn-sm btn-d" onclick="excluirHist(${h.id},'${h.cliente_nome.replace(/'/g,"\\'")}')">✕</button>
-    </div>`).join('');
+  document.getElementById('hist-count').textContent=HS.length+' registros';
+  document.getElementById('hist-body').innerHTML=!HS.length
+    ?'<div class="loading">Nenhum atendimento ainda</div>'
+    :HS.map(h=>`<div style="display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:flex-start">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:38px;padding-top:1px">${fmtH(h.created_at)}</div>
+        <div style="flex:1"><div style="font-size:13px"><strong>${h.cliente_nome}</strong> → ${h.vendedor_nome}</div>
+        <div class="text-sm">${h.interesse}</div></div>
+        <button class="btn btn-sm btn-danger" onclick="excluirHistorico(${h.id},'${h.cliente_nome.replace(/'/g,"\\'")}')">✕</button>
+      </div>`).join('');
 }
 
-function renderUsers(){
-  const tb=document.getElementById('u-tbody');if(!tb)return;
-  tb.innerHTML=USERS.map(u=>{
-    const v=VS.find(x=>x.id===u.vendedor_id);
-    const pb=u.perfil==='admin'?'bp':u.perfil==='recepcao'?'bi':'bg';
-    const pl=u.perfil==='admin'?'Admin':u.perfil==='recepcao'?'Recepção':'Vendedor';
-    return `<tr><td style="font-weight:500">${u.nome}</td><td class="txt-sm">${u.email}</td>
-      <td><span class="badge ${pb}">${pl}</span></td>
-      <td class="txt-sm">${v?v.nome:'—'}</td>
+function renderUsuarios(){
+  const tbody=document.getElementById('tbody-usuarios');if(!tbody)return;
+  tbody.innerHTML=USUARIOS.map(u=>{
+    const vend=VS.find(v=>v.id===u.vendedor_id);
+    const pBadge=u.perfil==='admin'?'b-purple':u.perfil==='recepcao'?'b-blue':'b-green';
+    const pLabel=u.perfil==='admin'?'Admin':u.perfil==='recepcao'?'Recepção':'Vendedor';
+    return `<tr><td style="font-weight:500">${u.nome}</td><td class="text-sm">${u.email}</td>
+      <td><span class="badge ${pBadge}">${pLabel}</span></td>
+      <td class="text-sm">${vend?vend.nome:'—'}</td>
       <td><div style="display:flex;gap:5px">
-        <button class="btn btn-sm" onclick="openEditUser('${u.id}')">Editar</button>
-        <button class="btn btn-sm btn-d" onclick="excluirUser('${u.id}','${u.nome.replace(/'/g,"\\'")}')">Remover</button>
+        <button class="btn btn-sm" onclick="openModalEditarUsuario('${u.id}')">Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="excluirUsuario('${u.id}','${u.nome.replace(/'/g,"\\'")}')">Remover</button>
       </div></td></tr>`;
   }).join('');
 }
 
-async function renderVendedor(){
-  if(!EU||EU.perfil!=='vendedor')return;
-  if(!MEU_VEND){
-    document.getElementById('vd-card').innerHTML='<div style="padding:18px;background:var(--bg2);border:1px solid var(--red-bg);border-radius:var(--rl);margin-bottom:12px;text-align:center;color:var(--red);font-size:13px">Vendedor não vinculado. Fale com o administrador.</div>';
-    document.getElementById('vd-stats').innerHTML='';
-    document.getElementById('vd-hist').innerHTML='<div class="loading">—</div>';
-    return;
-  }
-  const v=MEU_VEND;
-  // Card do cliente ativo
+async function renderVendedorMobile(){
+  if(!VENDEDOR_ATUAL){document.getElementById('vend-cliente-card').innerHTML='<div class="loading">Vendedor não vinculado</div>';return;}
+  const v=VENDEDOR_ATUAL;
   const meuAtivo=HS.find(h=>!h.encerrado&&h.vendedor_id===v.id);
+  // Buscar tel do cliente ativo
   let telCliente='';
   if(meuAtivo){
-    const {data:cli}=await db.from('clientes').select('tel').eq('vendedor_id',v.id).eq('encerrado',false).maybeSingle();
+    const {data:cli}=await db.from('clientes').select('tel,vendido').eq('vendedor_id',v.id).eq('encerrado',false).single().catch(()=>({data:null}));
     if(cli)telCliente=cli.tel||'';
   }
-  const card=document.getElementById('vd-card');
+  const cardEl=document.getElementById('vend-cliente-card');
   if(meuAtivo&&v.status==='atendendo'){
-    const tel=telCliente.replace(/\D/g,'');
-    card.innerHTML=`<div style="background:linear-gradient(135deg,rgba(0,214,126,.12),rgba(0,214,126,.04));border:1px solid rgba(0,214,126,.2);border-radius:var(--rl);padding:20px;margin-bottom:12px">
-      <div style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;margin-bottom:6px">Cliente atual</div>
+    const telFmt=telCliente.replace(/\D/g,'');
+    const waLink=telFmt?`https://wa.me/55${telFmt}`:'';
+    cardEl.innerHTML=`<div class="vend-card-cliente">
+      <div style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px">Cliente atual</div>
       <div style="font-size:20px;font-weight:600;margin-bottom:4px">${meuAtivo.cliente_nome}</div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:10px">${meuAtivo.interesse}</div>
-      ${tel?`<a href="https://wa.me/55${tel}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.25);border-radius:8px;color:#25d366;font-size:13px;font-weight:500;text-decoration:none;margin-bottom:10px">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:8px">${meuAtivo.interesse}</div>
+      ${waLink?`<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);border-radius:8px;color:#25d366;font-size:13px;font-weight:500;text-decoration:none;margin-bottom:10px">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        ${telCliente}</a>`:''}
-      <button onclick="marcarVendido(${meuAtivo.id})" style="display:block;width:100%;padding:10px;background:rgba(0,214,126,.12);border:1px solid rgba(0,214,126,.25);border-radius:8px;color:var(--green);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">
-        Marcar como vendido
-      </button>
+        ${telCliente}
+      </a>`:''}
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="marcarVendido(${meuAtivo.id})" style="flex:1;padding:10px;background:rgba(0,214,126,0.12);border:1px solid rgba(0,214,126,0.25);border-radius:8px;color:var(--green);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">
+          Marcar como vendido
+        </button>
+      </div>
     </div>`;
   }else{
-    card.innerHTML=`<div style="padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:12px;text-align:center;color:var(--text3);font-size:13px">
-      ${v.status==='disponivel'?'Disponível — aguardando cliente':'Sem cliente no momento'}
+    cardEl.innerHTML=`<div style="padding:18px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:14px;text-align:center;color:var(--text3);font-size:13px">
+      ${v.status==='disponivel'?'Disponível — aguardando próximo cliente':'Sem cliente no momento'}
     </div>`;
   }
-  // Stats
-  const pos=calcFila().findIndex(x=>x.id===v.id);
-  document.getElementById('vd-stats').innerHTML=`
-    <div class="metric"><div class="mv">${v.atend_hoje}</div><div class="ml">Atendidos hoje</div></div>
-    <div class="metric"><div class="mv">${pos>=0?pos+1+'º':'—'}</div><div class="ml">Posição na fila</div></div>
-    <div class="metric"><div class="mv" style="color:var(--green)">${v.vendas_hoje||0}</div><div class="ml">Vendas hoje</div></div>`;
-  // Botões status
-  ['sb-disp','sb-atend','sb-indisp'].forEach(id=>document.getElementById(id).className='sbtn');
-  if(v.status==='disponivel')document.getElementById('sb-disp').className='sbtn sG';
-  else if(v.status==='atendendo')document.getElementById('sb-atend').className='sbtn sA';
-  else document.getElementById('sb-indisp').className='sbtn sR';
-  // Histórico
+  const pos=calcOrdem().findIndex(x=>x.id===v.id);
+  document.getElementById('vend-stats').innerHTML=`
+    <div class="vend-stat"><div class="vend-stat-n">${v.atend_hoje}</div><div class="vend-stat-l">Atendidos hoje</div></div>
+    <div class="vend-stat"><div class="vend-stat-n">${pos>=0?pos+1+'º':'—'}</div><div class="vend-stat-l">Posição na fila</div></div>
+    <div class="vend-stat"><div class="vend-stat-n">${v.virtual>0?'+'+v.virtual:'—'}</div><div class="vend-stat-l">Virtuais</div></div>`;
+  ['disp','atend','indisp'].forEach(k=>document.getElementById('sbtn-'+k).className='sbtn');
+  if(v.status==='disponivel')document.getElementById('sbtn-disp').className='sbtn active-green';
+  else if(v.status==='atendendo')document.getElementById('sbtn-atend').className='sbtn active-amber';
+  else document.getElementById('sbtn-indisp').className='sbtn active-red';
   const meus=HS.filter(h=>h.vendedor_id===v.id).slice(0,10);
-  document.getElementById('vd-hist').innerHTML=!meus.length?'<div class="loading">Nenhum atendimento hoje</div>':meus.map(h=>`
-    <div style="display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:38px">${fmtH(h.created_at)}</div>
-      <div style="flex:1"><div style="font-size:13px;font-weight:500">${h.cliente_nome}</div><div class="txt-sm">${h.interesse}</div></div>
-      ${h.vendido?'<span class="badge bg" style="font-size:10px">Vendido</span>':''}
-    </div>`).join('');
+  document.getElementById('vend-historico-lista').innerHTML=!meus.length
+    ?'<div class="loading">Nenhum atendimento hoje</div>'
+    :meus.map(h=>`<div style="display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);padding-top:1px;min-width:38px">${fmtH(h.created_at)}</div>
+        <div><div style="font-size:13px;font-weight:500">${h.cliente_nome}</div><div class="text-sm">${h.interesse}</div></div>
+      </div>`).join('');
 }
 
+let ultimoAtendTV=0;
 function renderTV(){
-  const fila=calcFila();
-  const ativo=HS.find(h=>!h.encerrado&&VS.find(v=>v.id===h.vendedor_id&&v.status==='atendendo'));
+  const ord=calcOrdem();
+  const atendimentoAtivo=HS.find(h=>!h.encerrado&&VS.find(v=>v.id===h.vendedor_id&&v.status==='atendendo'));
   const nowEl=document.getElementById('tv-now');
-  if(ativo){
-    if(ativo.id!==TV_ULTIMO){tocarSom();TV_ULTIMO=ativo.id;}
-    nowEl.innerHTML=`<div class="tv-now"><div class="tv-num">A${String(HS.length).padStart(2,'0')}</div>
-      <div><div class="tv-lbl">Sendo atendido</div>
-      <div class="tv-name">${ativo.cliente_nome}</div>
-      <div class="tv-seller">Vendedor: ${ativo.vendedor_nome} · ${ativo.interesse}</div></div></div>`;
+  if(atendimentoAtivo){
+    // Tocar som se for atendimento novo
+    if(atendimentoAtivo.id!==ultimoAtendTV){
+      tocarSom();ultimoAtendTV=atendimentoAtivo.id;
+    }
+    nowEl.innerHTML=`<div class="tv-now"><div class="tv-now-num">A${String(HS.length).padStart(2,'0')}</div>
+      <div><div class="tv-now-label">Sendo atendido agora</div>
+      <div class="tv-now-name">${atendimentoAtivo.cliente_nome}</div>
+      <div class="tv-now-seller">Vendedor: ${atendimentoAtivo.vendedor_nome} · ${atendimentoAtivo.interesse}</div></div></div>`;
   }else{
-    TV_ULTIMO=0;nowEl.innerHTML='<div class="tv-empty">Aguardando próximo cliente...</div>';
+    ultimoAtendTV=0;
+    nowEl.innerHTML='<div class="tv-empty">Aguardando próximo cliente...</div>';
   }
-  document.getElementById('tv-q').innerHTML=!fila.length
-    ?'<div style="padding:20px;text-align:center;color:rgba(255,255,255,.2)">Nenhum disponível</div>'
-    :fila.slice(0,4).map((v,i)=>`<div class="tv-qr">
-        <div style="width:28px;height:28px;border-radius:7px;background:${i===0?'rgba(0,214,126,.15)':'rgba(255,255,255,.05)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:${i===0?'var(--green)':'rgba(255,255,255,.3)'};flex-shrink:0">${i+1}º</div>
-        <div style="flex:1"><div style="font-size:14px;color:${i===0?'rgba(255,255,255,.95)':'rgba(255,255,255,.6)'};font-weight:${i===0?600:400}">${v.nome}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.25)">${v.atend_hoje} atend. · ${ago(v.ultimo_atend)}</div></div>
-        <span class="tv-st ${i===0?'stN':'stW'}">${i===0?'Próximo':'Na fila'}</span>
+  document.getElementById('tv-queue').innerHTML=!ord.length
+    ?'<div style="padding:20px;text-align:center;color:rgba(255,255,255,0.2)">Nenhum vendedor disponível</div>'
+    :ord.slice(0,4).map((v,i)=>`<div class="tv-queue-row">
+        <div style="width:30px;height:30px;border-radius:7px;background:${i===0?'rgba(0,214,126,0.15)':'rgba(255,255,255,0.05)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:${i===0?'var(--green)':'rgba(255,255,255,0.3)'};flex-shrink:0">${i+1}º</div>
+        <div style="flex:1"><div style="font-size:14px;color:${i===0?'rgba(255,255,255,0.95)':'rgba(255,255,255,0.6)'};font-weight:${i===0?600:400}">${v.nome}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:1px">${v.atend_hoje} atend. hoje · livre há ${ago(v.ultimo_atend)}</div></div>
+        <span class="tv-queue-st ${i===0?'st-next':'st-wait'}">${i===0?'Próximo':'Na fila'}</span>
       </div>`).join('');
   document.getElementById('tv-team').innerHTML=VS.slice(0,12).map(v=>
     `<div class="tv-sc ${v.status==='disponivel'?'free':v.status==='atendendo'?'busy':''}">
-      <div style="font-size:20px;font-weight:600;color:#fff">${v.atend_hoje}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.6)">${v.nome.split(' ')[0]}</div>
-      <div style="font-size:10px;color:${v.status==='disponivel'?'var(--green)':v.status==='atendendo'?'var(--amber)':'var(--text3)'}">${SL[v.status]}</div>
+      <div class="tv-sc-num">${v.atend_hoje}</div>
+      <div class="tv-sc-name">${v.nome.split(' ')[0]}</div>
+      <div class="tv-sc-st" style="color:${v.status==='disponivel'?'var(--green)':v.status==='atendendo'?'var(--amber)':'var(--text3)'}">${SL[v.status]}</div>
     </div>`).join('');
 }
 
-// ── SOM ───────────────────────────────────────────────────────────────────
-function tocarSom(){
-  try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    [523,659,784].forEach((f,i)=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';
-      g.gain.setValueAtTime(0,ctx.currentTime+i*.15);
-      g.gain.linearRampToValueAtTime(.3,ctx.currentTime+i*.15+.05);
-      g.gain.linearRampToValueAtTime(0,ctx.currentTime+i*.15+.2);
-      o.start(ctx.currentTime+i*.15);o.stop(ctx.currentTime+i*.15+.25);
-    });
-  }catch(e){}
+// ── LOGIN ─────────────────────────────────────────────────────────────────
+async function fazerLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const senha=document.getElementById('login-senha').value;
+  const btn=document.getElementById('btn-login');
+  const err=document.getElementById('login-err');
+  err.style.display='none';btn.disabled=true;btn.textContent='Entrando...';
+  const {data,error}=await db.auth.signInWithPassword({email,password:senha});
+  if(error){err.textContent='E-mail ou senha incorretos.';err.style.display='block';btn.disabled=false;btn.textContent='Entrar';return;}
+  const {data:perfil}=await db.from('perfis').select('*').eq('id',data.user.id).single();
+  if(!perfil){err.textContent='Usuário sem perfil configurado.';err.style.display='block';await db.auth.signOut();btn.disabled=false;btn.textContent='Entrar';return;}
+  PERFIL_ATUAL=perfil;await iniciarSistema();btn.disabled=false;btn.textContent='Entrar';
 }
 
-// ── EXCLUIR HISTÓRICO ─────────────────────────────────────────────────────
-function excluirHist(id,nome){
-  confirmarExcluir('Excluir atendimento de "'+nome+'"?',async()=>{
-    await db.from('historico').delete().eq('id',id);
-    toast('Excluído','tG');await loadHS();renderGestao();
-  });
+async function sair(){
+  await db.auth.signOut();PERFIL_ATUAL=null;VENDEDOR_ATUAL=null;VS=[];HS=[];
+  document.getElementById('sistema').style.display='none';
+  document.getElementById('tela-login').style.display='flex';
 }
 
-// ── EXCLUIR VENDEDOR VIA ABA VENDEDORES ──────────────────────────────────
-function excluirUser(uid,nome,vid,vnome){
-  // Chamada via aba vendedores (vid e vnome) ou via aba usuários (uid e nome)
-  if(vid){
-    confirmarExcluir('Remover "'+vnome+'" completamente?',async()=>{
-      const {data:p}=await db.from('perfis').select('id').eq('vendedor_id',vid).maybeSingle();
-      await db.from('historico').delete().eq('vendedor_id',vid);
-      await db.from('clientes').delete().eq('vendedor_id',vid);
-      await db.from('vendedores').update({ativo:false}).eq('id',vid);
-      if(p){await db.from('perfis').delete().eq('id',p.id);await db.rpc('delete_user',{user_id:p.id});}
-      toast(vnome+' removido','tG');await loadVS();await loadHS();await loadUSERS();
-    });
+// ── INICIAR SISTEMA ───────────────────────────────────────────────────────
+async function iniciarSistema(){
+  // Recarregar perfil fresco do banco sempre
+  const {data:perfilAtual}=await db.from('perfis').select('*').eq('id',PERFIL_ATUAL.id).single();
+  if(perfilAtual) PERFIL_ATUAL=perfilAtual;
+  document.getElementById('tela-login').style.display='none';
+  document.getElementById('sistema').style.display='block';
+  document.getElementById('nav-user').textContent=PERFIL_ATUAL.nome+' ('+traduzPerfil(PERFIL_ATUAL.perfil)+')';
+  const tabs=document.getElementById('nav-tabs');tabs.innerHTML='';
+  if(PERFIL_ATUAL.perfil==='vendedor'){
+    addTab(tabs,'Minha Fila','vendedor-mobile');
+    document.getElementById('btn-trocar-senha').style.display='block';
   }else{
-    confirmarExcluir('Excluir "'+nome+'" completamente?',async()=>{
-      try{
-        const {data:p}=await db.from('perfis').select('*').eq('id',uid).single();
-        if(p?.vendedor_id){
-          await db.from('historico').delete().eq('vendedor_id',p.vendedor_id);
-          await db.from('clientes').delete().eq('vendedor_id',p.vendedor_id);
-          await db.from('vendedores').update({ativo:false}).eq('id',p.vendedor_id);
-        }
-        await db.from('perfis').delete().eq('id',uid);
-        await db.rpc('delete_user',{user_id:uid});
-        toast(nome+' removido','tG');await loadVS();await loadHS();await loadUSERS();
-      }catch(e){toast('Erro: '+e.message,'tR');}
-    });
+    addTab(tabs,'Recepção','recepcao');
+    addTab(tabs,'Vendedores','vendedores');
+    addTab(tabs,'Gestão','gestao');
+    addTab(tabs,'Relatório','relatorio');
+    if(PERFIL_ATUAL.perfil==='admin')addTab(tabs,'Usuários','usuarios');
+    addTab(tabs,'TV da Sala','tv');
+  }
+  // Reset diário
+  await verificarResetDiario();
+  await loadVendedores();await loadHistorico();
+  if(PERFIL_ATUAL.perfil==='admin')await loadUsuarios();
+  // Datas padrão do relatório
+  const hoje=new Date().toISOString().split('T')[0];
+  const semana=new Date(Date.now()-7*24*60*60*1000).toISOString().split('T')[0];
+  document.getElementById('rel-inicio').value=semana;
+  document.getElementById('rel-fim').value=hoje;
+  tabs.querySelector('.nav-tab')?.click();
+  if(PERFIL_ATUAL.perfil==='vendedor'&&PERFIL_ATUAL.vendedor_id){
+    VENDEDOR_ATUAL=VS.find(v=>v.id===parseInt(PERFIL_ATUAL.vendedor_id))||null;
+    renderVendedorMobile();
   }
 }
 
-// ── MODAL STATUS ──────────────────────────────────────────────────────────
+function traduzPerfil(p){return p==='admin'?'Admin':p==='recepcao'?'Recepção':'Vendedor';}
+function addTab(c,l,p){const b=document.createElement('button');b.className='nav-tab';b.textContent=l;b.onclick=()=>goPage(p,b);c.appendChild(b);}
+
+// ── MODAIS ────────────────────────────────────────────────────────────────
 function openModalStatus(id){
   document.getElementById('ms-vend').innerHTML=VS.map(v=>
     `<option value="${v.id}" ${v.id===id?'selected':''}>${v.nome} — ${SL[v.status]}</option>`).join('');
-  openM('m-status');
+  openModal('modal-status');
 }
+function openModalNovoUsuario(){
+  ['mu-nome','mu-tel','mu-email','mu-senha'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('mu-perfil').value='vendedor';toggleCamposVendedor();
+  openModal('modal-usuario');
+}
+function toggleCamposVendedor(){
+  const p=document.getElementById('mu-perfil').value;
+  document.getElementById('mu-aviso').style.display=p==='vendedor'?'block':'none';
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 
-// ── FILTRO VENDEDORES ─────────────────────────────────────────────────────
+// ── FILTROS ───────────────────────────────────────────────────────────────
 function setFiltro(f,btn){
-  FILTRO=f;
-  document.querySelectorAll('#v-filtros .btn').forEach(b=>{b.style.background='';b.style.color='';b.style.borderColor='';});
-  btn.style.background='var(--green-bg)';btn.style.color='var(--green)';btn.style.borderColor='rgba(0,214,126,.2)';
+  filtro=f;
+  document.querySelectorAll('#filtros-vend .btn').forEach(b=>{b.style.background='';b.style.color='';b.style.borderColor='';});
+  btn.style.background='var(--green-bg)';btn.style.color='var(--green)';btn.style.borderColor='rgba(0,214,126,0.2)';
   renderVend();
-}
-
-function toggleAviso(){
-  const p=document.getElementById('nu-perfil').value;
-  document.getElementById('nu-aviso').style.display=p==='vendedor'?'block':'none';
 }
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────────────────────────
 function goPage(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('p-'+id).classList.add('active');btn.classList.add('active');
+  document.getElementById('page-'+id).classList.add('active');btn.classList.add('active');
   const tv=id==='tv';
-  document.getElementById('nav').style.display=tv?'none':'flex';
-  if(tv){const p=document.getElementById('p-tv');p.style.padding='0';p.style.maxWidth='none';p.style.margin='0';}
+  document.getElementById('main-nav').style.display=tv?'none':'flex';
+  if(tv){const p=document.getElementById('page-tv');p.style.padding='0';p.style.maxWidth='none';p.style.margin='0';}
   renderAll();
 }
 
-// ── MODAIS ────────────────────────────────────────────────────────────────
-function openM(id){document.getElementById(id).classList.add('open');}
-function closeM(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.modal-wrap').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
-
 // ── TOAST ─────────────────────────────────────────────────────────────────
-function toast(msg,type='tG'){
-  const el=document.createElement('div');el.className='toast '+type;el.textContent=msg;
-  document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),3500);
+function toast(msg,type='green'){
+  const el=document.createElement('div');el.className='toast t-'+type;el.textContent=msg;
+  document.getElementById('toast-wrap').appendChild(el);setTimeout(()=>el.remove(),3500);
 }
 
 // ── RELÓGIO ───────────────────────────────────────────────────────────────
@@ -1066,19 +1082,12 @@ setInterval(()=>{
   if(nc)nc.textContent=h+':'+m;if(tc)tc.textContent=h+':'+m+':'+s;
 },1000);
 
-// ── FILTRO INICIAL ────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded',()=>{
-  const btn=document.querySelector('#v-filtros .btn');
-  if(btn){btn.style.background='var(--green-bg)';btn.style.color='var(--green)';btn.style.borderColor='rgba(0,214,126,.2)';}
-});
-
-// ── AUTO-REFRESH ──────────────────────────────────────────────────────────
+// ── AUTO-REFRESH 15s ──────────────────────────────────────────────────────
 setInterval(async()=>{
-  if(!EU)return;
-  await loadVS();await loadHS();
-  if(EU.perfil==='vendedor'&&EU.vendedor_id){
-    MEU_VEND=VS.find(v=>v.id===Number(EU.vendedor_id))||null;
-    renderVendedor();
+  if(!PERFIL_ATUAL)return;
+  await loadVendedores();await loadHistorico();
+  if(PERFIL_ATUAL.perfil==='vendedor'&&VENDEDOR_ATUAL){
+    VENDEDOR_ATUAL=VS.find(v=>v.id===parseInt(PERFIL_ATUAL.vendedor_id))||null;renderVendedorMobile();
   }
 },15000);
 
@@ -1086,9 +1095,8 @@ setInterval(async()=>{
 (async()=>{
   const {data:{session}}=await db.auth.getSession();
   if(session){
-    // Buscar perfil SEMPRE do banco, nunca da sessão
-    const {data:p}=await db.from('perfis').select('*').eq('id',session.user.id).single();
-    if(p){EU=p;await iniciar();}
+    const {data:perfil}=await db.from('perfis').select('*').eq('id',session.user.id).single();
+    if(perfil){PERFIL_ATUAL=perfil;await iniciarSistema();}
   }
 })();
 </script>

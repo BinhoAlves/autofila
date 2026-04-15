@@ -610,6 +610,7 @@ async function criarUsuario(){
   if(senha.length<6){toast('Senha mínimo 6 caracteres','tR');return;}
   const btn=document.getElementById('btn-criar');btn.disabled=true;btn.textContent='Criando...';
   try{
+    // 1. Criar vendedor na fila se necessário
     let vendedorId=null;
     if(perfil==='vendedor'){
       const {data:vd,error:ve}=await db.from('vendedores').insert({
@@ -621,14 +622,28 @@ async function criarUsuario(){
       if(ve)throw new Error('Erro ao criar vendedor: '+ve.message);
       vendedorId=vd.id;
     }
+    // 2. Criar usuário via SQL (evita erro de já registrado)
+    // Primeiro tenta signUp
     const {data:auth,error:ae}=await db.auth.signUp({email,password:senha,options:{data:{nome}}});
-    if(ae)throw new Error('Erro no login: '+ae.message);
-    if(!auth?.user)throw new Error('Usuário não criado');
-    // Definir senha corretamente
-    await db.rpc('trocar_senha',{user_id:auth.user.id,nova_senha:senha}).catch(()=>{});
-    // Criar perfil COM vendedor_id
-    await db.from('perfis').insert({id:auth.user.id,email,nome,perfil,vendedor_id:vendedorId});
-    toast(nome+' criado!','tG');
+    let userId=null;
+    if(ae){
+      // Se já existe, busca o ID existente
+      if(ae.message.includes('already registered')||ae.message.includes('already been registered')){
+        toast('E-mail já existe no sistema','tR');
+        // Reverter vendedor criado
+        if(vendedorId)await db.from('vendedores').update({ativo:false}).eq('id',vendedorId);
+        btn.disabled=false;btn.textContent='Criar';return;
+      }
+      throw new Error('Erro: '+ae.message);
+    }
+    userId=auth?.user?.id;
+    if(!userId)throw new Error('Usuário não criado');
+    // 3. Definir senha corretamente
+    await db.rpc('trocar_senha',{user_id:userId,nova_senha:senha}).catch(()=>{});
+    // 4. Criar perfil vinculado
+    const {error:pe}=await db.from('perfis').insert({id:userId,email,nome,perfil,vendedor_id:vendedorId});
+    if(pe)throw new Error('Erro ao criar perfil: '+pe.message);
+    toast(nome+' criado com sucesso!','tG');
     closeM('m-novo-user');
     ['nu-nome','nu-tel','nu-email','nu-senha'].forEach(i=>document.getElementById(i).value='');
     await loadVS();await loadUSERS();

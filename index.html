@@ -842,11 +842,40 @@ async function excluirVendedor(id, nome){
 }
 
 async function excluirUsuario(id, nome){
-  confirmarExcluir('Excluir usuário "'+nome+'" completamente? O acesso ao sistema será removido.', async()=>{
-    await db.from('perfis').delete().eq('id',id);
-    await db.rpc('delete_user', {user_id: id});
-    toast('Usuário '+nome+' removido completamente','green');
-    await loadUsuarios();
+  confirmarExcluir('Excluir usuário "'+nome+'" completamente? O acesso, histórico e todos os dados serão removidos.', async()=>{
+    try {
+      // Buscar vendedor vinculado
+      const {data:perfil}=await db.from('perfis').select('*').eq('id',id).single();
+      
+      if(perfil?.vendedor_id){
+        // Buscar nome do vendedor
+        const {data:vend}=await db.from('vendedores').select('nome').eq('id',perfil.vendedor_id).single();
+        const nomeVend = vend?.nome || '';
+
+        // Apagar histórico e clientes pelo vendedor_id
+        await db.from('historico').delete().eq('vendedor_id', perfil.vendedor_id);
+        // Apagar também pelo nome (garantia)
+        if(nomeVend) {
+          await db.from('historico').delete().eq('vendedor_nome', nomeVend);
+          await db.from('clientes').delete().eq('vendedor_nome', nomeVend);
+        }
+        // Desativar vendedor
+        await db.from('vendedores').update({ativo:false}).eq('id', perfil.vendedor_id);
+      }
+
+      // Apagar perfil
+      await db.from('perfis').delete().eq('id', id);
+      
+      // Apagar login
+      await db.rpc('delete_user', {user_id: id});
+
+      toast(nome+' removido completamente','green');
+      await loadVendedores();
+      await loadHistorico();
+      await loadUsuarios();
+    } catch(e){
+      toast('Erro ao remover: '+e.message,'red');
+    }
   });
 }
 

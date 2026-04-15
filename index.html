@@ -769,7 +769,6 @@ function popularSelectVendedor(){
   sel.innerHTML='<option value="">Todos os vendedores</option>'+
     VS.map(v=>`<option value="${v.nome}" ${v.nome===atual?'selected':''}>${v.nome}</option>`).join('');
 }
-
 // ── RENDERS ───────────────────────────────────────────────────────────────
 function renderAll(){
   if(PERFIL_ATUAL?.perfil==='vendedor'){renderVendedorMobile();return;}
@@ -888,7 +887,7 @@ function renderUsuarios(){
   }).join('');
 }
 
-function renderVendedorMobile(){
+async function renderVendedorMobile(){
   if(!VENDEDOR_ATUAL){document.getElementById('vend-cliente-card').innerHTML='<div class="loading">Vendedor não vinculado</div>';return;}
   const v=VENDEDOR_ATUAL;
   const meuAtivo=HS.find(h=>!h.encerrado&&h.vendedor_id===v.id);

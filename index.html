@@ -122,7 +122,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .sbtn{padding:10px 8px;border-radius:var(--radius);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .15s;font-family:'DM Sans',sans-serif;text-align:center}
 .sbtn.active-green{background:var(--green-bg);color:var(--green);border-color:rgba(0,214,126,0.3)}
 .sbtn.active-amber{background:var(--amber-bg);color:var(--amber);border-color:rgba(245,166,35,0.3)}
-.sbtn.active-gray{background:rgba(139,144,160,0.1);color:var(--text2);border-color:rgba(139,144,160,0.2)}
+.sbtn.active-red{background:var(--red-bg);color:var(--red);border-color:rgba(255,79,106,0.3)}
 
 /* TV */
 .tv-screen{background:#070a0f;min-height:100vh}
@@ -822,9 +822,10 @@ async function excluirVendedor(id, nome){
 }
 
 async function excluirUsuario(id, nome){
-  confirmarExcluir('Excluir acesso de "'+nome+'"?', async()=>{
+  confirmarExcluir('Excluir usuário "'+nome+'" completamente? O acesso ao sistema será removido.', async()=>{
     await db.from('perfis').delete().eq('id',id);
-    toast('Acesso de '+nome+' removido','green');
+    await db.rpc('delete_user', {user_id: id});
+    toast('Usuário '+nome+' removido completamente','green');
     await loadUsuarios();
   });
 }
@@ -968,7 +969,7 @@ function renderVendedorMobile(){
   ['disp','atend','indisp'].forEach(k=>document.getElementById('sbtn-'+k).className='sbtn');
   if(v.status==='disponivel') document.getElementById('sbtn-disp').className='sbtn active-green';
   else if(v.status==='atendendo') document.getElementById('sbtn-atend').className='sbtn active-amber';
-  else document.getElementById('sbtn-indisp').className='sbtn active-gray';
+  else document.getElementById('sbtn-indisp').className='sbtn active-red';
 
   // Histórico do vendedor
   const meus=HS.filter(h=>h.vendedor_nome===v.nome).slice(0,10);

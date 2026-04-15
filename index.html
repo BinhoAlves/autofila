@@ -814,10 +814,18 @@ async function excluirHistorico(id, clienteNome){
 }
 
 async function excluirVendedor(id, nome){
-  confirmarExcluir('Desativar vendedor "'+nome+'"? Ele sairá da fila mas o histórico é mantido.', async()=>{
+  confirmarExcluir('Remover vendedor "'+nome+'"? O acesso ao sistema também será removido. O histórico de atendimentos é mantido.', async()=>{
+    // Desativar vendedor da fila
     await db.from('vendedores').update({ativo:false}).eq('id',id);
-    toast(nome+' removido da equipe','green');
+    // Buscar perfil vinculado e remover login
+    const {data:perfil}=await db.from('perfis').select('id').eq('vendedor_id',id).single();
+    if(perfil){
+      await db.from('perfis').delete().eq('id',perfil.id);
+      await db.rpc('delete_user',{user_id:perfil.id});
+    }
+    toast(nome+' removido da equipe e do sistema','green');
     await loadVendedores();
+    await loadUsuarios();
   });
 }
 
@@ -993,14 +1001,24 @@ function renderTV(){
   } else {
     nowEl.innerHTML='<div class="tv-empty">Aguardando próximo cliente...</div>';
   }
-  document.getElementById('tv-queue').innerHTML=!ord.length
-    ?'<div style="padding:24px;text-align:center;color:rgba(255,255,255,0.2)">Nenhum vendedor disponível</div>'
-    :ord.slice(0,4).map((v,i)=>`<div class="tv-queue-row">
-        <span class="tv-queue-num">${i+1}º</span>
-        <span class="tv-queue-name">Aguardando</span>
-        <span class="tv-queue-seller">${v.nome}</span>
-        <span class="tv-queue-st ${i===0?'st-next':'st-wait'}">${i===0?'Próximo':'Aguardando'}</span>
+
+  // Fila — mostra vendedores disponíveis esperando
+  const queueEl=document.getElementById('tv-queue');
+  if(!ord.length){
+    queueEl.innerHTML='<div style="padding:24px;text-align:center;color:rgba(255,255,255,0.2)">Nenhum vendedor disponível</div>';
+  } else {
+    queueEl.innerHTML=ord.slice(0,4).map((v,i)=>`
+      <div class="tv-queue-row">
+        <div style="width:32px;height:32px;border-radius:8px;background:${i===0?'rgba(0,214,126,0.15)':'rgba(255,255,255,0.05)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:${i===0?'var(--green)':'rgba(255,255,255,0.3)'};flex-shrink:0">${i+1}º</div>
+        <div style="flex:1">
+          <div style="font-size:15px;color:${i===0?'rgba(255,255,255,0.95)':'rgba(255,255,255,0.6)'};font-weight:${i===0?600:400}">${v.nome}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:2px">${v.atend_hoje} atendimento${v.atend_hoje!==1?'s':''} hoje · livre há ${ago(v.ultimo_atend)}</div>
+        </div>
+        <span class="tv-queue-st ${i===0?'st-next':'st-wait'}">${i===0?'Próximo':'Na fila'}</span>
       </div>`).join('');
+  }
+
+  // Equipe
   document.getElementById('tv-team').innerHTML=VS.slice(0,12).map(v=>
     `<div class="tv-sc ${v.status==='disponivel'?'free':v.status==='atendendo'?'busy':''}">
       <div class="tv-sc-num">${v.atend_hoje}</div>

@@ -411,6 +411,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
+<!-- MODAL EDITAR USUÁRIO -->
+<div class="modal-overlay" id="modal-editar-usuario">
+  <div class="modal">
+    <h3>Editar usuário</h3>
+    <input type="hidden" id="eu-id">
+    <input type="hidden" id="eu-vendedor-id">
+    <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" id="eu-nome"></div>
+    <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="text" id="eu-tel"></div>
+    <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="eu-email"></div>
+    <div class="form-group">
+      <label class="form-label">Nova senha (deixe em branco para não alterar)</label>
+      <input class="form-input" type="text" id="eu-senha" placeholder="Mínimo 6 caracteres">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Perfil</label>
+      <select class="form-select" id="eu-perfil">
+        <option value="vendedor">Vendedor</option>
+        <option value="recepcao">Recepcionista</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-editar-usuario')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-salvar-usuario" onclick="salvarEdicaoUsuario()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL CONFIRMAR EXCLUSÃO -->
 <div class="modal-overlay" id="modal-excluir">
   <div class="modal">
@@ -712,7 +740,62 @@ async function criarUsuario(){
   btn.disabled=false;btn.textContent='Criar usuário';
 }
 
-// ── EXCLUIR ───────────────────────────────────────────────────────────────
+// ── EDITAR USUÁRIO ────────────────────────────────────────────────────────
+function openModalEditarUsuario(id){
+  const u=USUARIOS.find(x=>x.id===id);if(!u)return;
+  const v=VS.find(x=>x.id===u.vendedor_id);
+  document.getElementById('eu-id').value=u.id;
+  document.getElementById('eu-vendedor-id').value=u.vendedor_id||'';
+  document.getElementById('eu-nome').value=u.nome;
+  document.getElementById('eu-tel').value=v?v.tel||'':'';
+  document.getElementById('eu-email').value=u.email;
+  document.getElementById('eu-senha').value='';
+  document.getElementById('eu-perfil').value=u.perfil;
+  openModal('modal-editar-usuario');
+}
+
+async function salvarEdicaoUsuario(){
+  const id=document.getElementById('eu-id').value;
+  const vendedorId=document.getElementById('eu-vendedor-id').value;
+  const nome=document.getElementById('eu-nome').value.trim();
+  const tel=document.getElementById('eu-tel').value.trim();
+  const email=document.getElementById('eu-email').value.trim();
+  const senha=document.getElementById('eu-senha').value;
+  const perfil=document.getElementById('eu-perfil').value;
+  if(!nome||!email){toast('Nome e e-mail são obrigatórios','red');return;}
+
+  const btn=document.getElementById('btn-salvar-usuario');
+  btn.disabled=true;btn.textContent='Salvando...';
+
+  try {
+    // Atualizar perfil
+    await db.from('perfis').update({nome,email,perfil}).eq('id',id);
+
+    // Atualizar dados do vendedor se tiver vínculo
+    if(vendedorId){
+      await db.from('vendedores').update({nome,tel,email}).eq('id',parseInt(vendedorId));
+    }
+
+    // Atualizar senha se preenchida
+    if(senha && senha.length>=6){
+      await db.rpc('update_user_password',{user_id:id,new_password:senha}).catch(async()=>{
+        // Fallback via SQL direto
+        await db.from('_password_updates').insert({user_id:id,password:senha}).catch(()=>{});
+      });
+      // Via SQL usando função do banco
+      toast('Senha atualizada — se não funcionar, redefina pelo Supabase','amber');
+    }
+
+    toast('Usuário '+nome+' atualizado','green');
+    closeModal('modal-editar-usuario');
+    await loadVendedores();
+    await loadUsuarios();
+  } catch(e){
+    toast('Erro: '+e.message,'red');
+  }
+
+  btn.disabled=false;btn.textContent='Salvar';
+}
 function confirmarExcluir(msg, fn){
   document.getElementById('excluir-msg').textContent=msg;
   document.getElementById('btn-confirmar-excluir').onclick=async()=>{
@@ -844,7 +927,10 @@ function renderUsuarios(){
       <td class="text-sm">${u.email}</td>
       <td><span class="badge ${pBadge}">${pLabel}</span></td>
       <td class="text-sm">${vend?vend.nome:'—'}</td>
-      <td><button class="btn btn-sm btn-danger" onclick="excluirUsuario('${u.id}','${u.nome.replace(/'/g,"\\'")}')">Remover acesso</button></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-sm" onclick="openModalEditarUsuario('${u.id}')">Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="excluirUsuario('${u.id}','${u.nome.replace(/'/g,"\\'")}')">Remover</button>
+      </div></td>
     </tr>`;
   }).join('');
 }

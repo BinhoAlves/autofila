@@ -1053,12 +1053,16 @@ async function iniciarSistema(){
   if(PERFIL_ATUAL.perfil==='vendedor'){
     addTab(tabs,'Minha Fila','vendedor-mobile');
     document.getElementById('btn-trocar-senha').style.display='block';
+  }else if(PERFIL_ATUAL.perfil==='recepcao'){
+    addTab(tabs,'Recepção','recepcao');
+    addTab(tabs,'Vendedores','vendedores');
+    addTab(tabs,'TV da Sala','tv');
   }else{
     addTab(tabs,'Recepção','recepcao');
     addTab(tabs,'Vendedores','vendedores');
     addTab(tabs,'Gestão','gestao');
     addTab(tabs,'Relatório','relatorio');
-    if(PERFIL_ATUAL.perfil==='admin')addTab(tabs,'Usuários','usuarios');
+    addTab(tabs,'Usuários','usuarios');
     addTab(tabs,'TV da Sala','tv');
   }
   // Reset diário

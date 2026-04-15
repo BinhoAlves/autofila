@@ -414,7 +414,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <script>
 const {createClient}=supabase;
-const db=createClient('https://vopgulrbstnguprdizjg.supabase.co','sb_publishable_bRVz1wtI3gZuOCS13DaT8g_RRIZcZOH');
+const SUPA_URL='https://vopgulrbstnguprdizjg.supabase.co';
+const SUPA_ANON='sb_publishable_bRVz1wtI3gZuOCS13DaT8g_RRIZcZOH';
+const SUPA_SERVICE='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvcGd1bHJic3RuZ3VwcmRpempnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjIxNTY0NSwiZXhwIjoyMDkxNzkxNjQ1fQ.ielat9B_UTCsqdgJoYRewmvEDIQ5ndhEhzhK66njzTk';
+const db=createClient(SUPA_URL,SUPA_ANON);
+const dbAdmin=createClient(SUPA_URL,SUPA_SERVICE);
 
 const SB={disponivel:'b-green',atendendo:'b-amber',indisponivel:'b-gray',ferias:'b-red'};
 const SL={disponivel:'Disponível',atendendo:'Atendendo',indisponivel:'Indisponível',ferias:'Férias'};
@@ -611,11 +615,11 @@ async function criarUsuario(){
       if(ve)throw new Error('Erro ao criar vendedor: '+ve.message);
       vendedorId=vd.id;
     }
-    const {data:authData,error:authErr}=await db.auth.signUp({email,password:senha,options:{data:{nome}}});
+    const {data:authData,error:authErr}=await dbAdmin.auth.admin.createUser({
+      email, password:senha, email_confirm:true, user_metadata:{nome}
+    });
     if(authErr)throw new Error('Erro ao criar login: '+authErr.message);
     if(!authData?.user)throw new Error('Usuário não foi criado');
-    // Confirmar e-mail e definir senha corretamente
-    await db.rpc('trocar_senha',{user_id:authData.user.id,nova_senha:senha}).catch(()=>{});
     await db.from('perfis').insert({id:authData.user.id,email,nome,perfil,vendedor_id:vendedorId});
     toast(nome+' criado com sucesso!','green');
     if(perfil==='vendedor')toast('Vendedor adicionado à fila','green');

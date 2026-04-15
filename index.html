@@ -162,6 +162,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <span class="nav-user" id="nav-user"></span>
       <div class="online-dot"></div>
       <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)" id="nav-clock">--:--</span>
+      <button class="btn btn-sm" id="btn-trocar-senha" style="display:none" onclick="openModal('modal-trocar-senha')">Senha</button>
       <button class="btn btn-sm" onclick="sair()">Sair</button>
     </div>
   </nav>
@@ -303,7 +304,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="card-hdr"><h3>Minha fila do dia</h3></div>
         <div id="vend-historico-lista"></div>
       </div>
-      <button class="btn" style="width:100%;margin-top:8px" onclick="openModal('modal-trocar-senha')">Trocar minha senha</button>
     </div>
   </div>
 
@@ -563,7 +563,18 @@ async function mudarStatusVendedor(ns){
   renderVendedorMobile();
 }
 
-// ── TROCAR SENHA ──────────────────────────────────────────────────────────
+// ── MARCAR VENDIDO ────────────────────────────────────────────────────────
+async function marcarVendido(historicoId){
+  await db.from('historico').update({vendido:true}).eq('id',historicoId);
+  await db.from('clientes').update({vendido:true}).eq('vendedor_id',VENDEDOR_ATUAL.id).eq('encerrado',false);
+  // Incrementar contador de vendas no vendedor
+  const v=VENDEDOR_ATUAL;
+  await db.from('vendedores').update({vendas_hoje:(v.vendas_hoje||0)+1}).eq('id',v.id);
+  toast('Venda registrada!','green');
+  await loadVendedores();await loadHistorico();
+  VENDEDOR_ATUAL=VS.find(x=>x.id===v.id)||null;
+  renderVendedorMobile();
+}
 async function trocarSenha(){
   const nova=document.getElementById('nova-senha').value;
   const conf=document.getElementById('conf-senha').value;
@@ -715,29 +726,37 @@ async function gerarRelatorio(){
   }
   const porVend={};
   registros.forEach(r=>{
-    if(!porVend[r.vendedor_nome])porVend[r.vendedor_nome]={total:0,tipos:{}};
+    if(!porVend[r.vendedor_nome])porVend[r.vendedor_nome]={total:0,vendas:0};
     porVend[r.vendedor_nome].total++;
-    porVend[r.vendedor_nome].tipos[r.interesse]=(porVend[r.vendedor_nome].tipos[r.interesse]||0)+1;
+    if(r.vendido)porVend[r.vendedor_nome].vendas++;
   });
   const ranking=Object.entries(porVend).sort((a,b)=>b[1].total-a[1].total);
+  const totalVendas=registros.filter(r=>r.vendido).length;
   document.getElementById('rel-resultado').innerHTML=`
-    <div class="grid${vendFiltro?'2':'4'}" style="gap:12px;margin-bottom:16px">
-      <div class="metric"><div class="metric-val">${registros.length}</div><div class="metric-lbl">Total de atendimentos</div></div>
+    <div class="grid${vendFiltro?'3':'4'}" style="gap:12px;margin-bottom:16px">
+      <div class="metric"><div class="metric-val">${registros.length}</div><div class="metric-lbl">Atendimentos</div></div>
+      <div class="metric"><div class="metric-val" style="color:var(--green)">${totalVendas}</div><div class="metric-lbl">Vendas realizadas</div></div>
       ${!vendFiltro?`<div class="metric"><div class="metric-val">${ranking.length}</div><div class="metric-lbl">Vendedores ativos</div></div>`:''}
-      ${vendFiltro?`<div class="metric"><div class="metric-val">${ranking[0]?ranking[0][1].total:0}</div><div class="metric-lbl">Atend. de ${vendFiltro.split(' ')[0]}</div></div>`:''}
+      <div class="metric"><div class="metric-val">${registros.length>0?Math.round(totalVendas/registros.length*100):0}%</div><div class="metric-lbl">Taxa de conversão</div></div>
     </div>
     ${!vendFiltro?`<div class="card" style="margin-bottom:16px">
-      <div class="card-hdr"><h3>Ranking do período</h3></div>
-      <table class="tbl"><thead><tr><th>#</th><th>Vendedor</th><th>Atendimentos</th></tr></thead>
-      <tbody>${ranking.map(([nome,d],i)=>`<tr><td><strong>${i+1}</strong></td><td>${nome}</td><td style="font-weight:500">${d.total}</td></tr>`).join('')}</tbody></table>
+      <div class="card-hdr"><h3>Ranking de atendimentos e vendas</h3></div>
+      <table class="tbl"><thead><tr><th>#</th><th>Vendedor</th><th>Atendimentos</th><th>Vendas</th><th>Conversão</th></tr></thead>
+      <tbody>${ranking.map(([nome,d],i)=>`<tr>
+        <td><strong>${i+1}</strong></td><td>${nome}</td>
+        <td style="font-weight:500">${d.total}</td>
+        <td style="font-weight:500;color:var(--green)">${d.vendas}</td>
+        <td style="color:var(--text2)">${d.total>0?Math.round(d.vendas/d.total*100):0}%</td>
+      </tr>`).join('')}</tbody></table>
     </div>`:''}
     <div class="card">
       <div class="card-hdr"><h3>Histórico${vendFiltro?' — '+vendFiltro:''}</h3><span class="text-sm">${registros.length} registros</span></div>
       <div style="max-height:400px;overflow-y:auto">${registros.map(h=>`
-        <div style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:flex-start">
-          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:90px;padding-top:1px">${new Date(h.created_at).toLocaleDateString('pt-BR')} ${fmtH(h.created_at)}</div>
+        <div style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center">
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:90px">${new Date(h.created_at).toLocaleDateString('pt-BR')} ${fmtH(h.created_at)}</div>
           <div style="flex:1"><div style="font-size:13px"><strong>${h.cliente_nome}</strong>${!vendFiltro?' → '+h.vendedor_nome:''}</div>
           <div class="text-sm">${h.interesse}</div></div>
+          ${h.vendido?'<span class="badge b-green"><span class="badge-dot"></span>Vendido</span>':''}
         </div>`).join('')}
       </div>
     </div>`;
@@ -873,13 +892,29 @@ function renderVendedorMobile(){
   if(!VENDEDOR_ATUAL){document.getElementById('vend-cliente-card').innerHTML='<div class="loading">Vendedor não vinculado</div>';return;}
   const v=VENDEDOR_ATUAL;
   const meuAtivo=HS.find(h=>!h.encerrado&&h.vendedor_id===v.id);
+  // Buscar tel do cliente ativo
+  let telCliente='';
+  if(meuAtivo){
+    const {data:cli}=await db.from('clientes').select('tel,vendido').eq('vendedor_id',v.id).eq('encerrado',false).single().catch(()=>({data:null}));
+    if(cli)telCliente=cli.tel||'';
+  }
   const cardEl=document.getElementById('vend-cliente-card');
   if(meuAtivo&&v.status==='atendendo'){
+    const telFmt=telCliente.replace(/\D/g,'');
+    const waLink=telFmt?`https://wa.me/55${telFmt}`:'';
     cardEl.innerHTML=`<div class="vend-card-cliente">
       <div style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px">Cliente atual</div>
       <div style="font-size:20px;font-weight:600;margin-bottom:4px">${meuAtivo.cliente_nome}</div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${meuAtivo.interesse}</div>
-      <div style="font-size:11px;color:var(--text3)">${fmtH(meuAtivo.created_at)}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:8px">${meuAtivo.interesse}</div>
+      ${waLink?`<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.25);border-radius:8px;color:#25d366;font-size:13px;font-weight:500;text-decoration:none;margin-bottom:10px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        ${telCliente}
+      </a>`:''}
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="marcarVendido(${meuAtivo.id})" style="flex:1;padding:10px;background:rgba(0,214,126,0.12);border:1px solid rgba(0,214,126,0.25);border-radius:8px;color:var(--green);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">
+          Marcar como vendido
+        </button>
+      </div>
     </div>`;
   }else{
     cardEl.innerHTML=`<div style="padding:18px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:14px;text-align:center;color:var(--text3);font-size:13px">
@@ -966,6 +1001,7 @@ async function iniciarSistema(){
   const tabs=document.getElementById('nav-tabs');tabs.innerHTML='';
   if(PERFIL_ATUAL.perfil==='vendedor'){
     addTab(tabs,'Minha Fila','vendedor-mobile');
+    document.getElementById('btn-trocar-senha').style.display='block';
   }else{
     addTab(tabs,'Recepção','recepcao');
     addTab(tabs,'Vendedores','vendedores');

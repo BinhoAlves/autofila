@@ -616,7 +616,7 @@ async function registrarCliente(){
 
   await db.from('vendedores').update({status:'atendendo',ultimo_atend:agora,atend_hoje:v.atend_hoje+1}).eq('id',v.id);
   await db.from('clientes').insert({nome,tel,interesse,observacao:obs,vendedor_id:v.id,vendedor_nome:v.nome,criterio:c});
-  await db.from('historico').insert({cliente_nome:nome,interesse,vendedor_nome:v.nome,criterio:c});
+  await db.from('historico').insert({cliente_nome:nome,interesse,vendedor_nome:v.nome,criterio:c,vendedor_id:v.id});
 
   document.getElementById('rec-nome-cli').textContent=nome;
   document.getElementById('rec-vendedor').textContent=v.nome;
@@ -814,18 +814,26 @@ async function excluirHistorico(id, clienteNome){
 }
 
 async function excluirVendedor(id, nome){
-  confirmarExcluir('Remover vendedor "'+nome+'"? O acesso, histórico de atendimentos e login serão removidos.', async()=>{
-    // Apagar histórico de atendimentos
+  confirmarExcluir('Remover vendedor "'+nome+'"? O acesso, histórico e login serão removidos.', async()=>{
+    // Buscar perfil vinculado antes de remover
+    const {data:perfil}=await db.from('perfis').select('id').eq('vendedor_id',id).single();
+
+    // Apagar histórico pelo ID do vendedor
+    await db.from('clientes').delete().eq('vendedor_id', id);
+
+    // Apagar histórico pelo nome (garantia dupla)
     await db.from('historico').delete().eq('vendedor_nome', nome);
     await db.from('clientes').delete().eq('vendedor_nome', nome);
-    // Desativar vendedor da fila
+
+    // Desativar vendedor
     await db.from('vendedores').update({ativo:false}).eq('id',id);
-    // Buscar perfil vinculado e remover login
-    const {data:perfil}=await db.from('perfis').select('id').eq('vendedor_id',id).single();
+
+    // Remover perfil e login
     if(perfil){
       await db.from('perfis').delete().eq('id',perfil.id);
       await db.rpc('delete_user',{user_id:perfil.id});
     }
+
     toast(nome+' removido completamente','green');
     await loadVendedores();
     await loadHistorico();

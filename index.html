@@ -384,24 +384,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
-<!-- MODAL NOVO USUÁRIO -->
+<!-- MODAL NOVO USUÁRIO UNIFICADO -->
 <div class="modal-overlay" id="modal-usuario">
   <div class="modal">
     <h3>Novo usuário</h3>
-    <div class="form-group"><label class="form-label">Nome</label><input class="form-input" type="text" id="mu-nome" placeholder="Ex: Maria Recepcionista"></div>
-    <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" type="email" id="mu-email" placeholder="email@loja.com"></div>
+    <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" type="text" id="mu-nome" placeholder="Ex: Carlos Mendes"></div>
+    <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" type="text" id="mu-tel" placeholder="(11) 99999-9999"></div>
+    <div class="form-group"><label class="form-label">E-mail (usado para login)</label><input class="form-input" type="email" id="mu-email" placeholder="email@loja.com"></div>
     <div class="form-group"><label class="form-label">Senha inicial</label><input class="form-input" type="text" id="mu-senha" placeholder="Mínimo 6 caracteres"></div>
     <div class="form-group">
       <label class="form-label">Perfil</label>
-      <select class="form-select" id="mu-perfil" onchange="toggleVendedorSelect()">
-        <option value="recepcao">Recepcionista</option>
+      <select class="form-select" id="mu-perfil" onchange="toggleCamposVendedor()">
         <option value="vendedor">Vendedor</option>
+        <option value="recepcao">Recepcionista</option>
         <option value="admin">Administrador</option>
       </select>
     </div>
-    <div class="form-group" id="mu-vend-grupo">
-      <label class="form-label">Vincular ao vendedor</label>
-      <select class="form-select" id="mu-vendedor-id"></select>
+    <div id="mu-aviso" style="display:none;padding:10px 14px;background:var(--blue-bg);border:1px solid rgba(79,158,255,0.2);border-radius:var(--radius);font-size:12px;color:var(--blue);margin-bottom:16px">
+      O vendedor será cadastrado automaticamente na fila com esses dados.
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-usuario')">Cancelar</button>
@@ -652,43 +652,63 @@ async function salvarVendedor(){
   await loadVendedores();
 }
 
-// ── CRIAR USUÁRIO ─────────────────────────────────────────────────────────
+// ── CRIAR USUÁRIO UNIFICADO ───────────────────────────────────────────────
 async function criarUsuario(){
-  const nome=document.getElementById('mu-nome').value.trim();
-  const email=document.getElementById('mu-email').value.trim();
-  const senha=document.getElementById('mu-senha').value;
-  const perfil=document.getElementById('mu-perfil').value;
-  const vendId=perfil==='vendedor'?parseInt(document.getElementById('mu-vendedor-id').value):null;
-  if(!nome||!email||!senha){toast('Preencha todos os campos','red');return;}
+  const nome  = document.getElementById('mu-nome').value.trim();
+  const tel   = document.getElementById('mu-tel').value.trim();
+  const email = document.getElementById('mu-email').value.trim();
+  const senha = document.getElementById('mu-senha').value;
+  const perfil= document.getElementById('mu-perfil').value;
+  if(!nome||!email||!senha){toast('Preencha nome, e-mail e senha','red');return;}
   if(senha.length<6){toast('Senha deve ter pelo menos 6 caracteres','red');return;}
 
   const btn=document.getElementById('btn-criar-usuario');
   btn.disabled=true;btn.textContent='Criando...';
 
-  // Criar usuário no Supabase Auth via Admin API não está disponível no client
-  // Usamos uma função edge ou inserimos direto via SQL — simplificamos:
-  // Criar o usuário e pedir para ele redefinir a senha
-  const {data,error}=await db.auth.admin?.createUser?.({email,password:senha,email_confirm:true}) || {data:null,error:{message:'use SQL'}};
-
-  if(error || !data?.user){
-    // Alternativa: orientar a criar manualmente no Supabase
-    toast('Crie o usuário no Supabase Auth e depois adicione o perfil aqui','amber');
-    // Salva perfil com ID temporário baseado no email para associar depois
-    const {data:authData}=await db.from('perfis').select('id').eq('email',email).single();
-    if(authData){
-      await db.from('perfis').update({nome,perfil,vendedor_id:vendId}).eq('email',email);
+  try {
+    // 1. Criar vendedor na fila se for perfil vendedor
+    let vendedorId=null;
+    if(perfil==='vendedor'){
+      const {data:vd,error:ve}=await db.from('vendedores').insert({
+        nome,tel,email,
+        status:'disponivel',
+        ultimo_atend:new Date(Date.now()-99999999).toISOString(),
+        atend_hoje:0,virtual:0,
+        entrou_as:new Date().toISOString(),
+        ativo:true
+      }).select().single();
+      if(ve)throw new Error('Erro ao criar vendedor: '+ve.message);
+      vendedorId=vd.id;
     }
-    btn.disabled=false;btn.textContent='Criar usuário';
+
+    // 2. Criar login via Supabase Auth (signup sem confirmar email)
+    const {data:authData,error:authErr}=await db.auth.signUp({
+      email,password:senha,
+      options:{data:{nome}}
+    });
+
+    if(authErr)throw new Error('Erro ao criar login: '+authErr.message);
+    if(!authData?.user)throw new Error('Usuário não foi criado');
+
+    // 3. Criar perfil vinculando ao vendedor
+    await db.from('perfis').insert({
+      id:authData.user.id,
+      email,nome,perfil,
+      vendedor_id:vendedorId
+    });
+
+    toast(nome+' criado com sucesso!','green');
+    if(perfil==='vendedor') toast('Vendedor adicionado à fila automaticamente','green');
+
     closeModal('modal-usuario');
+    await loadVendedores();
     await loadUsuarios();
-    return;
+
+  } catch(e){
+    toast(e.message,'red');
   }
 
-  await db.from('perfis').insert({id:data.user.id,email,nome,perfil,vendedor_id:vendId});
-  toast(nome+' criado com sucesso','green');
   btn.disabled=false;btn.textContent='Criar usuário';
-  closeModal('modal-usuario');
-  await loadUsuarios();
 }
 
 // ── EXCLUIR ───────────────────────────────────────────────────────────────
@@ -918,13 +938,14 @@ function openModalVendedor(id){
   openModal('modal-vendedor');
 }
 function openModalNovoUsuario(){
-  document.getElementById('mu-vendedor-id').innerHTML=VS.map(v=>`<option value="${v.id}">${v.nome}</option>`).join('');
-  toggleVendedorSelect();
+  ['mu-nome','mu-tel','mu-email','mu-senha'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mu-perfil').value='vendedor';
+  toggleCamposVendedor();
   openModal('modal-usuario');
 }
-function toggleVendedorSelect(){
+function toggleCamposVendedor(){
   const p=document.getElementById('mu-perfil').value;
-  document.getElementById('mu-vend-grupo').style.display=p==='vendedor'?'block':'none';
+  document.getElementById('mu-aviso').style.display=p==='vendedor'?'block':'none';
 }
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}

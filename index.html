@@ -250,9 +250,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
   <!-- VENDEDORES -->
   <div class="page" id="page-vendedores">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div><div class="section-title">Equipe de vendas</div><div style="font-size:20px;font-weight:600" id="v-count-title">—</div></div>
-      <button class="btn btn-primary" onclick="openModalVendedor(null)">+ Novo vendedor</button>
+    <div style="margin-bottom:20px">
+      <div class="section-title">Equipe de vendas</div>
+      <div style="font-size:20px;font-weight:600" id="v-count-title">—</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">Para adicionar vendedores acesse a aba Usuários</div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="filtros-vend">
       <button class="btn btn-sm" id="f-todos" onclick="setFiltro('todos',this)">Todos</button>
@@ -802,7 +803,6 @@ function renderVend(){
       <td>${v.virtual>0?`<span class="badge b-purple">+${v.virtual}</span>`:'<span class="text-sm">—</span>'}</td>
       <td style="font-weight:500;font-family:'DM Mono',monospace">${v.atend_hoje+v.virtual}</td>
       <td><div style="display:flex;gap:6px">
-        <button class="btn btn-sm" onclick="openModalVendedor(${v.id})">Editar</button>
         <button class="btn btn-sm" onclick="openModalStatus(${v.id})">Status</button>
         <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${v.id},'${v.nome.replace(/'/g,"\\'")}')">Remover</button>
       </div></td>

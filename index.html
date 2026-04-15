@@ -243,6 +243,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="rel-periodo">
       <div class="form-group"><label class="form-label">Data início</label><input class="form-input" type="date" id="rel-inicio"></div>
       <div class="form-group"><label class="form-label">Data fim</label><input class="form-input" type="date" id="rel-fim"></div>
+      <div class="form-group"><label class="form-label">Vendedor</label>
+        <select class="form-select" id="rel-vendedor" style="min-width:180px">
+          <option value="">Todos os vendedores</option>
+        </select>
+      </div>
       <button class="btn btn-primary" onclick="gerarRelatorio()">Gerar relatório</button>
     </div>
     <div id="rel-resultado"></div>
@@ -441,7 +446,7 @@ function calcVirtual(excId){
 // ── BANCO ─────────────────────────────────────────────────────────────────
 async function loadVendedores(){
   const {data}=await db.from('vendedores').select('*').eq('ativo',true).order('id');
-  VS=data||[];renderAll();
+  VS=data||[];popularSelectVendedor();renderAll();
 }
 async function loadHistorico(){
   const {data}=await db.from('historico').select('*').order('created_at',{ascending:false}).limit(100);
@@ -669,16 +674,18 @@ async function excluirHistorico(id,clienteNome){
 async function gerarRelatorio(){
   const ini=document.getElementById('rel-inicio').value;
   const fim=document.getElementById('rel-fim').value;
+  const vendFiltro=document.getElementById('rel-vendedor').value;
   if(!ini||!fim){toast('Selecione o período','red');return;}
-  const {data}=await db.from('historico').select('*')
+  let query=db.from('historico').select('*')
     .gte('created_at',ini+'T00:00:00').lte('created_at',fim+'T23:59:59')
     .order('created_at',{ascending:false});
+  if(vendFiltro)query=query.eq('vendedor_nome',vendFiltro);
+  const {data}=await query;
   const registros=data||[];
   if(!registros.length){
     document.getElementById('rel-resultado').innerHTML='<div class="loading">Nenhum atendimento no período selecionado</div>';
     return;
   }
-  // Agrupar por vendedor
   const porVend={};
   registros.forEach(r=>{
     if(!porVend[r.vendedor_nome])porVend[r.vendedor_nome]={total:0,tipos:{}};
@@ -687,25 +694,34 @@ async function gerarRelatorio(){
   });
   const ranking=Object.entries(porVend).sort((a,b)=>b[1].total-a[1].total);
   document.getElementById('rel-resultado').innerHTML=`
-    <div class="grid2" style="gap:16px;margin-bottom:16px">
+    <div class="grid${vendFiltro?'2':'4'}" style="gap:12px;margin-bottom:16px">
       <div class="metric"><div class="metric-val">${registros.length}</div><div class="metric-lbl">Total de atendimentos</div></div>
-      <div class="metric"><div class="metric-val">${ranking.length}</div><div class="metric-lbl">Vendedores ativos no período</div></div>
+      ${!vendFiltro?`<div class="metric"><div class="metric-val">${ranking.length}</div><div class="metric-lbl">Vendedores ativos</div></div>`:''}
+      ${vendFiltro?`<div class="metric"><div class="metric-val">${ranking[0]?ranking[0][1].total:0}</div><div class="metric-lbl">Atend. de ${vendFiltro.split(' ')[0]}</div></div>`:''}
     </div>
-    <div class="card" style="margin-bottom:16px">
+    ${!vendFiltro?`<div class="card" style="margin-bottom:16px">
       <div class="card-hdr"><h3>Ranking do período</h3></div>
       <table class="tbl"><thead><tr><th>#</th><th>Vendedor</th><th>Atendimentos</th></tr></thead>
       <tbody>${ranking.map(([nome,d],i)=>`<tr><td><strong>${i+1}</strong></td><td>${nome}</td><td style="font-weight:500">${d.total}</td></tr>`).join('')}</tbody></table>
-    </div>
+    </div>`:''}
     <div class="card">
-      <div class="card-hdr"><h3>Histórico completo — ${fmtData(ini+' ')} a ${fmtData(fim+' ')}</h3><span class="text-sm">${registros.length} registros</span></div>
+      <div class="card-hdr"><h3>Histórico${vendFiltro?' — '+vendFiltro:''}</h3><span class="text-sm">${registros.length} registros</span></div>
       <div style="max-height:400px;overflow-y:auto">${registros.map(h=>`
         <div style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:flex-start">
           <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:90px;padding-top:1px">${new Date(h.created_at).toLocaleDateString('pt-BR')} ${fmtH(h.created_at)}</div>
-          <div style="flex:1"><div style="font-size:13px"><strong>${h.cliente_nome}</strong> → ${h.vendedor_nome}</div>
+          <div style="flex:1"><div style="font-size:13px"><strong>${h.cliente_nome}</strong>${!vendFiltro?' → '+h.vendedor_nome:''}</div>
           <div class="text-sm">${h.interesse}</div></div>
         </div>`).join('')}
       </div>
     </div>`;
+}
+
+function popularSelectVendedor(){
+  const sel=document.getElementById('rel-vendedor');
+  if(!sel)return;
+  const atual=sel.value;
+  sel.innerHTML='<option value="">Todos os vendedores</option>'+
+    VS.map(v=>`<option value="${v.nome}" ${v.nome===atual?'selected':''}>${v.nome}</option>`).join('');
 }
 
 // ── RENDERS ───────────────────────────────────────────────────────────────

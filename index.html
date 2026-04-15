@@ -115,7 +115,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .vend-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px;text-align:center}
 .vend-stat-n{font-size:22px;font-weight:600}.vend-stat-l{font-size:11px;color:var(--text2);margin-top:2px}
 .status-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+/* MOBILE RESPONSIVO */
+@media(max-width:600px){
+  .nav{padding:0 12px}
+  .nav-logo{font-size:14px;padding:12px 12px 12px 0}
+  .nav-tab{padding:14px 10px;font-size:12px}
+  .nav-right{gap:6px}
+  .nav-user{display:none}
+  .page{padding:12px}
+  .card-hdr{padding:11px 14px}
+  .card-body{padding:14px}
+  .tbl th,.tbl td{padding:8px 10px;font-size:12px}
+  .metric{padding:12px}
+  .metric-val{font-size:22px}
+  .vend-mobile{max-width:100%}
+  .vend-card-cliente{padding:16px}
+  .rel-periodo{flex-direction:column}
+  .rel-periodo .form-group{min-width:100%}
+  .tv-body{grid-template-columns:1fr;padding:16px}
+  .tv-right{display:none}
+  .tv-now-name{font-size:22px}
+  .tv-now-num{width:52px;height:52px;font-size:18px}
+}
 </style>
 </head>
 <body>
@@ -278,18 +299,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <button class="sbtn" id="sbtn-atend" onclick="mudarStatusVendedor('atendendo')">Atendendo</button>
         <button class="sbtn" id="sbtn-indisp" onclick="mudarStatusVendedor('indisponivel')">Indisponível</button>
       </div>
-      <div class="card" style="margin-bottom:14px">
+      <div class="card">
         <div class="card-hdr"><h3>Minha fila do dia</h3></div>
         <div id="vend-historico-lista"></div>
       </div>
-      <div class="card">
-        <div class="card-hdr"><h3>Trocar minha senha</h3></div>
-        <div class="card-body">
-          <div class="form-group"><label class="form-label">Nova senha</label><input class="form-input" type="password" id="nova-senha" placeholder="Mínimo 6 caracteres"></div>
-          <div class="form-group"><label class="form-label">Confirmar senha</label><input class="form-input" type="password" id="conf-senha" placeholder="Repita a senha"></div>
-          <button class="btn btn-primary" style="width:100%" onclick="trocarSenha()">Salvar nova senha</button>
-        </div>
-      </div>
+      <button class="btn" style="width:100%;margin-top:8px" onclick="openModal('modal-trocar-senha')">Trocar minha senha</button>
     </div>
   </div>
 
@@ -371,6 +385,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-editar-usuario')">Cancelar</button>
       <button class="btn btn-primary" id="btn-salvar-usuario" onclick="salvarEdicaoUsuario()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TROCAR SENHA -->
+<div class="modal-overlay" id="modal-trocar-senha">
+  <div class="modal"><h3>Trocar minha senha</h3>
+    <div class="form-group"><label class="form-label">Nova senha</label><input class="form-input" type="password" id="nova-senha" placeholder="Mínimo 6 caracteres"></div>
+    <div class="form-group"><label class="form-label">Confirmar senha</label><input class="form-input" type="password" id="conf-senha" placeholder="Repita a nova senha"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-trocar-senha')">Cancelar</button>
+      <button class="btn btn-primary" onclick="trocarSenha()">Salvar senha</button>
     </div>
   </div>
 </div>
@@ -505,8 +531,8 @@ async function confirmarStatus(){
   const ns=document.getElementById('ms-status').value;
   const v=VS.find(x=>x.id===id);if(!v)return;
   const up={status:ns};
-  if(ns==='disponivel'){
-    up.entrou_as=new Date().toISOString();
+  if(ns==='disponivel'||ns==='indisponivel'){
+    if(ns==='disponivel')up.entrou_as=new Date().toISOString();
     await db.from('historico').update({encerrado:true}).eq('vendedor_id',id).eq('encerrado',false);
     await db.from('clientes').update({encerrado:true}).eq('vendedor_id',id).eq('encerrado',false);
   }
@@ -525,8 +551,8 @@ async function confirmarStatus(){
 async function mudarStatusVendedor(ns){
   if(!VENDEDOR_ATUAL)return;
   const up={status:ns};
-  if(ns==='disponivel'){
-    up.entrou_as=new Date().toISOString();
+  if(ns==='disponivel'||ns==='indisponivel'){
+    if(ns==='disponivel')up.entrou_as=new Date().toISOString();
     await db.from('historico').update({encerrado:true}).eq('vendedor_id',VENDEDOR_ATUAL.id).eq('encerrado',false);
     await db.from('clientes').update({encerrado:true}).eq('vendedor_id',VENDEDOR_ATUAL.id).eq('encerrado',false);
   }
@@ -548,6 +574,7 @@ async function trocarSenha(){
     toast('Senha alterada com sucesso!','green');
     document.getElementById('nova-senha').value='';
     document.getElementById('conf-senha').value='';
+    closeModal('modal-trocar-senha');
   }catch(e){toast('Erro ao trocar senha: '+e.message,'red');}
 }
 

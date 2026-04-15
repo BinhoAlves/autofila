@@ -1020,7 +1020,7 @@ async function iniciarSistema(){
   document.getElementById('rel-fim').value=hoje;
   tabs.querySelector('.nav-tab')?.click();
   if(PERFIL_ATUAL.perfil==='vendedor'&&PERFIL_ATUAL.vendedor_id){
-    VENDEDOR_ATUAL=VS.find(v=>v.id===PERFIL_ATUAL.vendedor_id)||null;
+    VENDEDOR_ATUAL=VS.find(v=>v.id===parseInt(PERFIL_ATUAL.vendedor_id))||null;
     renderVendedorMobile();
   }
 }
@@ -1084,7 +1084,7 @@ setInterval(async()=>{
   if(!PERFIL_ATUAL)return;
   await loadVendedores();await loadHistorico();
   if(PERFIL_ATUAL.perfil==='vendedor'&&VENDEDOR_ATUAL){
-    VENDEDOR_ATUAL=VS.find(v=>v.id===VENDEDOR_ATUAL.id)||null;renderVendedorMobile();
+    VENDEDOR_ATUAL=VS.find(v=>v.id===parseInt(PERFIL_ATUAL.vendedor_id))||null;renderVendedorMobile();
   }
 },15000);
 

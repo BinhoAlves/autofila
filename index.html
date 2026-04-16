@@ -1492,13 +1492,13 @@ async function gerarRel(){
 
 /* ══ RESET MANUAL ═════════════════════════════════════════ */
 async function resetManual(){
-  confirmarExcluir('Zerar contadores de todos os vendedores? Os atendimentos de hoje voltam para 0. O histórico é preservado.',async()=>{
+  confirmarExcluir('Zerar tudo? Contadores e histórico de atendimentos serão apagados. Esta ação não pode ser desfeita.',async()=>{
     await db.from('vendedores').update({atend_hoje:0,vendas_hoje:0}).eq('ativo',true);
-    await db.from('historico').update({encerrado:true}).eq('encerrado',false);
-    await db.from('clientes').update({encerrado:true}).eq('encerrado',false);
+    await db.from('historico').delete().neq('id',0);
+    await db.from('clientes').delete().neq('id',0);
     await db.from('vendedores').update({status:'disponivel',entrou_as:new Date().toISOString()})
       .eq('status','atendendo').eq('ativo',true);
-    toast('Contadores zerados!','t-g');
+    toast('Tudo zerado!','t-g');
     await loadVS();await loadHS();
   });
 }

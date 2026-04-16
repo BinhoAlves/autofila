@@ -463,7 +463,18 @@ const SUPA_URL='https://vopgulrbstnguprdizjg.supabase.co';
 const SUPA_ANON='sb_publishable_bRVz1wtI3gZuOCS13DaT8g_RRIZcZOH';
 const SUPA_SERVICE='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvcGd1bHJic3RuZ3VwcmRpempnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjIxNTY0NSwiZXhwIjoyMDkxNzkxNjQ1fQ.ielat9B_UTCsqdgJoYRewmvEDIQ5ndhEhzhK66njzTk';
 const db=createClient(SUPA_URL,SUPA_ANON);
-const dbAdmin=createClient(SUPA_URL,SUPA_SERVICE);
+
+// Criar usuário via API REST admin (evita segundo cliente)
+async function adminCreateUser(email,password,nome){
+  const res=await fetch(`${SUPA_URL}/auth/v1/admin/users`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SUPA_SERVICE,'Authorization':'Bearer '+SUPA_SERVICE},
+    body:JSON.stringify({email,password,email_confirm:true,user_metadata:{nome}})
+  });
+  const data=await res.json();
+  if(!res.ok)throw new Error(data.message||data.msg||'Erro ao criar usuário');
+  return data;
+}
 
 const SB={disponivel:'b-green',atendendo:'b-amber',indisponivel:'b-gray',ferias:'b-red'};
 const SL={disponivel:'Disponível',atendendo:'Atendendo',indisponivel:'Indisponível',ferias:'Férias'};
@@ -478,9 +489,8 @@ const ini=n=>{const p=n.trim().split(' ');return(p[0][0]+(p[1]?p[1][0]:'')).toUp
 const fmtH=d=>new Date(d).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 const fmtData=d=>new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
 function ago(d){
-  const ms=Date.now()-new Date(d);
-  const m=Math.floor(ms/60000);
-  if(m>60*24*30)return 'Nunca atendeu';
+  if(!d||new Date(d).getFullYear()<2020)return 'Nunca atendeu';
+  const m=Math.floor((Date.now()-new Date(d))/60000);
   if(m<1)return 'Agora';if(m<60)return m+'min atrás';
   const h=Math.floor(m/60);return h+'h'+(m%60>0?m%60+'min':'')+ ' atrás';
 }
@@ -662,12 +672,9 @@ async function criarUsuario(){
       if(ve)throw new Error('Erro ao criar vendedor: '+ve.message);
       vendedorId=vd.id;
     }
-    const {data:authData,error:authErr}=await dbAdmin.auth.admin.createUser({
-      email, password:senha, email_confirm:true, user_metadata:{nome}
-    });
-    if(authErr)throw new Error('Erro ao criar login: '+authErr.message);
-    if(!authData?.user)throw new Error('Usuário não foi criado');
-    await db.from('perfis').insert({id:authData.user.id,email,nome,perfil,vendedor_id:vendedorId});
+    const authData=await adminCreateUser(email,senha,nome);
+    if(!authData?.id)throw new Error('Usuário não foi criado');
+    await db.from('perfis').insert({id:authData.id,email,nome,perfil,vendedor_id:vendedorId});
     toast(nome+' criado com sucesso!','green');
     if(perfil==='vendedor')toast('Vendedor adicionado à fila','green');
     closeModal('modal-usuario');

@@ -1074,6 +1074,7 @@ body {
 </div>
 
 <!-- MODAL EXCLUIR -->
+<div class="mwrap" id="m-excluir">
   <div class="modal"><h3>Confirmar exclusão</h3>
     <p style="font-size:13px;color:var(--c-text2);margin-bottom:16px" id="m-excluir-msg"></p>
     <div class="mfoot"><button class="btn" onclick="closeM('m-excluir')">Cancelar</button><button class="btn btn-d" id="btn-excluir-ok">Excluir</button></div>
@@ -1395,21 +1396,21 @@ async function confirmarTransferir(){
   await db.from('historico').update({encerrado:true}).eq('id',histId);
   await db.from('clientes').update({encerrado:true}).eq('vendedor_id',vendOrigemId).eq('encerrado',false);
 
-  // Vendedor origem: volta para a fila com -1 atendimento
-  // Buscar o penúltimo atendimento dele (anterior ao que foi transferido)
-  const {data:histAnterior}=await db.from('historico')
-    .select('created_at')
-    .eq('vendedor_id',vendOrigemId)
-    .neq('id',histId) // exclui o atual
-    .order('created_at',{ascending:false})
-    .limit(1)
-    .maybeSingle();
-  // Se não tiver histórico anterior, usa data antiga para ficar na frente da fila
-  const ultimoAtendAnterior=histAnterior?.created_at||new Date('2000-01-01').toISOString();
+  // Vendedor origem: volta para a fila na posição correta
+  // Pega o ultimo_atend mais antigo entre os disponíveis para colocar antes deles
+  const disponiveis=VS.filter(v=>v.status==='disponivel'&&v.id!==vendOrigemId);
+  let ultimoAtendAnterior;
+  if(disponiveis.length>0){
+    // Pega o timestamp mais antigo e subtrai 1 segundo para ficar na frente
+    const maisAntigo=disponiveis.reduce((min,v)=>new Date(v.ultimo_atend)<new Date(min.ultimo_atend)?v:min);
+    ultimoAtendAnterior=new Date(new Date(maisAntigo.ultimo_atend).getTime()-1000).toISOString();
+  }else{
+    ultimoAtendAnterior=new Date('2000-01-01').toISOString();
+  }
 
   await db.from('vendedores').update({
     status:'disponivel',
-    entrou_as:vOrigem.entrou_as, // preserva posição na fila
+    entrou_as:vOrigem.entrou_as,
     atend_hoje:Math.max(0,(vOrigem.atend_hoje||1)-1),
     ultimo_atend:ultimoAtendAnterior
   }).eq('id',vendOrigemId);

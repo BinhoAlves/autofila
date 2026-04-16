@@ -1395,15 +1395,21 @@ async function confirmarTransferir(){
   await db.from('historico').update({encerrado:true}).eq('id',histId);
   await db.from('clientes').update({encerrado:true}).eq('vendedor_id',vendOrigemId).eq('encerrado',false);
 
-  // Vendedor origem: volta para a fila com -1 atendimento e timestamp anterior
+  // Vendedor origem: volta para a fila com -1 atendimento
+  // Buscar o penúltimo atendimento dele (anterior ao que foi transferido)
   const {data:histAnterior}=await db.from('historico')
-    .select('created_at').eq('vendedor_id',vendOrigemId).eq('encerrado',true)
-    .order('created_at',{ascending:false}).limit(1).maybeSingle();
+    .select('created_at')
+    .eq('vendedor_id',vendOrigemId)
+    .neq('id',histId) // exclui o atual
+    .order('created_at',{ascending:false})
+    .limit(1)
+    .maybeSingle();
+  // Se não tiver histórico anterior, usa data antiga para ficar na frente da fila
   const ultimoAtendAnterior=histAnterior?.created_at||new Date('2000-01-01').toISOString();
 
   await db.from('vendedores').update({
     status:'disponivel',
-    entrou_as:vOrigem.entrou_as, // mantém o entrou_as original — não vai para o final da fila
+    entrou_as:vOrigem.entrou_as, // preserva posição na fila
     atend_hoje:Math.max(0,(vOrigem.atend_hoje||1)-1),
     ultimo_atend:ultimoAtendAnterior
   }).eq('id',vendOrigemId);

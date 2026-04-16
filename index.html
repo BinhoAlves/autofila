@@ -1400,8 +1400,10 @@ async function confirmarTransferir(){
     .select('created_at').eq('vendedor_id',vendOrigemId).eq('encerrado',true)
     .order('created_at',{ascending:false}).limit(1).maybeSingle();
   const ultimoAtendAnterior=histAnterior?.created_at||new Date('2000-01-01').toISOString();
+
   await db.from('vendedores').update({
-    status:'disponivel',entrou_as:agora,
+    status:'disponivel',
+    entrou_as:vOrigem.entrou_as, // mantém o entrou_as original — não vai para o final da fila
     atend_hoje:Math.max(0,(vOrigem.atend_hoje||1)-1),
     ultimo_atend:ultimoAtendAnterior
   }).eq('id',vendOrigemId);

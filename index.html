@@ -1395,8 +1395,7 @@ async function confirmarTransferir(){
   const {data:hist}=await db.from('historico').select('*').eq('id',histId).single();
   if(!hist){toast('Atendimento não encontrado','t-r');return;}
 
-  // Encerrar atendimento original
-  await db.from('historico').update({encerrado:true}).eq('id',histId);
+  // Encerrar cliente original do vendedor origem
   await db.from('clientes').update({encerrado:true}).eq('vendedor_id',vOrigem.id).eq('encerrado',false);
 
   // Colocar vendedor origem na frente da fila com dados originais preservados
@@ -1421,16 +1420,18 @@ async function confirmarTransferir(){
     atend_hoje:vDestino.atend_hoje+1
   }).eq('id',vendDestinoId);
 
-  await db.from('clientes').insert({
-    nome:hist.cliente_nome,tel:'',interesse:hist.interesse,
-    vendedor_id:vendDestinoId,vendedor_nome:vDestino.nome,
-    criterio:'Transferência de '+vOrigem.nome,encerrado:false,vendido:false
-  });
-  await db.from('historico').insert({
-    cliente_nome:hist.cliente_nome,interesse:hist.interesse,
-    vendedor_nome:vDestino.nome,criterio:'Transferência de '+vOrigem.nome,
-    vendedor_id:vendDestinoId,encerrado:false,vendido:false
-  });
+  // Em vez de criar novo registro, atualiza o original para o novo vendedor
+  await db.from('historico').update({
+    vendedor_nome: vDestino.nome,
+    vendedor_id: vendDestinoId,
+    encerrado: false
+  }).eq('id',histId);
+
+  // Atualiza o cliente ativo para o novo vendedor
+  await db.from('clientes').update({
+    vendedor_id: vendDestinoId,
+    vendedor_nome: vDestino.nome
+  }).eq('vendedor_id',vOrigem.id).eq('encerrado',false);
 
   TR_VEND_ORIGEM=null;
   toast(hist.cliente_nome+' transferido para '+vDestino.nome,'t-g');
@@ -1461,8 +1462,6 @@ async function gerarRel(){
   let q=db.from('historico').select('*')
     .gte('created_at',ini+'T00:00:00')
     .lte('created_at',fim+'T23:59:59')
-    .eq('encerrado',true) // só atendimentos concluídos
-    .not('criterio','ilike','Transferência%') // exclui transferências
     .order('created_at',{ascending:false});
   if(vend)q=q.eq('vendedor_nome',vend);
   const {data}=await q;const regs=data||[];
@@ -1570,7 +1569,7 @@ function renderGestao(){
     <td class="mono" style="font-weight:700;color:var(--c-green)">${v.vendas_hoje||0}</td>
     <td><span class="badge ${SB[v.status]}"><span class="bdot"></span>${SL[v.status]}</span></td></tr>`
   ).join('');
-  const HSReal=HS.filter(h=>!h.criterio?.startsWith('Transferência'));
+  const HSReal=HS;
   document.getElementById('g-hist-n').textContent=HSReal.length+' registros';
   document.getElementById('g-hist').innerHTML=!HSReal.length?'<div class="empty">Nenhum atendimento hoje</div>':HSReal.map(h=>`
     <div class="hist-item">
@@ -1636,7 +1635,7 @@ async function renderVendedor(){
   if(v.status==='disponivel')document.getElementById('sb-disp').className='sbtn s-g';
   else if(v.status==='atendendo')document.getElementById('sb-atend').className='sbtn s-a';
   else document.getElementById('sb-indisp').className='sbtn s-r';
-  const meus=HS.filter(h=>h.vendedor_id===v.id&&!h.criterio?.startsWith('Transferência')).slice(0,10);
+  const meus=HS.filter(h=>h.vendedor_id===v.id).slice(0,10);
   document.getElementById('vd-hist').innerHTML=!meus.length?'<div class="empty">Nenhum atendimento hoje</div>':meus.map(h=>`
     <div class="hist-item">
       <div class="hist-time">${fmtH(h.created_at)}</div>

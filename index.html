@@ -1158,7 +1158,6 @@ async function loadVS(){
 }
 async function loadHS(){
   const {data}=await db.from('historico').select('*')
-    .not('criterio','ilike','Transferência%')
     .order('created_at',{ascending:false}).limit(100);
   HS=data||[];
 }
@@ -1570,8 +1569,9 @@ function renderGestao(){
     <td class="mono" style="font-weight:700;color:var(--c-green)">${v.vendas_hoje||0}</td>
     <td><span class="badge ${SB[v.status]}"><span class="bdot"></span>${SL[v.status]}</span></td></tr>`
   ).join('');
-  document.getElementById('g-hist-n').textContent=HS.length+' registros';
-  document.getElementById('g-hist').innerHTML=!HS.length?'<div class="empty">Nenhum atendimento hoje</div>':HS.map(h=>`
+  const HSReal=HS.filter(h=>!h.criterio?.startsWith('Transferência'));
+  document.getElementById('g-hist-n').textContent=HSReal.length+' registros';
+  document.getElementById('g-hist').innerHTML=!HSReal.length?'<div class="empty">Nenhum atendimento hoje</div>':HSReal.map(h=>`
     <div class="hist-item">
       <div class="hist-time">${fmtH(h.created_at)}</div>
       <div class="hist-info"><div class="hist-name">${h.cliente_nome} → ${h.vendedor_nome}</div>
@@ -1635,7 +1635,7 @@ async function renderVendedor(){
   if(v.status==='disponivel')document.getElementById('sb-disp').className='sbtn s-g';
   else if(v.status==='atendendo')document.getElementById('sb-atend').className='sbtn s-a';
   else document.getElementById('sb-indisp').className='sbtn s-r';
-  const meus=HS.filter(h=>h.vendedor_id===v.id).slice(0,10);
+  const meus=HS.filter(h=>h.vendedor_id===v.id&&!h.criterio?.startsWith('Transferência')).slice(0,10);
   document.getElementById('vd-hist').innerHTML=!meus.length?'<div class="empty">Nenhum atendimento hoje</div>':meus.map(h=>`
     <div class="hist-item">
       <div class="hist-time">${fmtH(h.created_at)}</div>

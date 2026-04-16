@@ -911,7 +911,10 @@ body {
 
   <!-- GESTÃO -->
   <div class="page" id="p-gestao">
-    <div class="sec-head"><div class="sec-title">Resumo do dia</div><div class="sec-h1">Gestão</div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div class="sec-head" style="margin:0"><div class="sec-title">Resumo do dia</div><div class="sec-h1">Gestão</div></div>
+      <button class="btn btn-d" onclick="resetManual()">🔄 Zerar contadores</button>
+    </div>
     <div class="g4" style="margin-bottom:20px">
       <div class="metric"><div class="metric-val" id="g-total">—</div><div class="metric-lbl">Clientes atendidos</div></div>
       <div class="metric"><div class="metric-val" style="color:var(--c-green)" id="g-disp">—</div><div class="metric-lbl">Disponíveis agora</div></div>
@@ -1119,14 +1122,7 @@ function ago(d){
 }
 
 /* ══ RESET DIÁRIO ══════════════════════════════════════════ */
-async function resetDiario(){
-  const hoje=new Date().toDateString();
-  if(localStorage.getItem('af_reset')!==hoje){
-    await db.from('vendedores').update({atend_hoje:0,vendas_hoje:0}).eq('ativo',true);
-    await db.from('historico').update({encerrado:true}).eq('encerrado',false);
-    localStorage.setItem('af_reset',hoje);
-  }
-}
+// Reset diário removido — contadores acumulam e admin zera manualmente
 
 /* ══ FILA ══════════════════════════════════════════════════ */
 function calcFila(){
@@ -1494,7 +1490,20 @@ async function gerarRel(){
     </div>`;
 }
 
-/* ══ RENDERS ══════════════════════════════════════════════ */
+/* ══ RESET MANUAL ═════════════════════════════════════════ */
+async function resetManual(){
+  confirmarExcluir('Zerar contadores de todos os vendedores? Os atendimentos de hoje voltam para 0. O histórico é preservado.',async()=>{
+    await db.from('vendedores').update({atend_hoje:0,vendas_hoje:0}).eq('ativo',true);
+    await db.from('historico').update({encerrado:true}).eq('encerrado',false);
+    await db.from('clientes').update({encerrado:true}).eq('encerrado',false);
+    await db.from('vendedores').update({status:'disponivel',entrou_as:new Date().toISOString()})
+      .eq('status','atendendo').eq('ativo',true);
+    toast('Contadores zerados!','t-g');
+    await loadVS();await loadHS();
+  });
+}
+
+
 function renderAll(){
   if(EU?.perfil==='vendedor'){renderVendedor();return;}
   renderRec();renderVend();renderGestao();renderTV();
@@ -1714,7 +1723,6 @@ async function iniciar(){
     addTab('Recepção','recepcao');addTab('Vendedores','vendedores');addTab('Gestão','gestao');
     addTab('Relatório','relatorio');addTab('Usuários','usuarios');addTab('TV da Sala','tv');
   }
-  await resetDiario();
   await loadVS();await loadHS();
   if(EU.perfil==='admin')await loadUSERS();
   const hoje=new Date().toISOString().split('T')[0];

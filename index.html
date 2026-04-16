@@ -849,7 +849,7 @@ body {
           <div class="card-head"><span class="card-title">Novo cliente</span><span class="badge b-g"><span class="bdot"></span>Sistema ativo</span></div>
           <div class="card-body">
             <div class="fg"><label class="fl">Nome do cliente</label><input class="fi" type="text" id="f-nome" placeholder="Ex: João da Silva"></div>
-            <div class="fg"><label class="fl">Telefone</label><input class="fi" type="text" id="f-tel" placeholder="(11) 99999-9999" inputmode="tel"></div>
+            <div class="fg"><label class="fl">Telefone</label><input class="fi" type="tel" id="f-tel" placeholder="(11) 99999-9999" inputmode="numeric" pattern="[0-9\s\(\)\-]*"></div>
             <div class="fg"><label class="fl">Interesse</label>
               <select class="fs" id="f-interesse">
                 <option>Compra — novo</option><option>Compra — seminovo</option>
@@ -1021,7 +1021,7 @@ body {
 <div class="mwrap" id="m-novo-user">
   <div class="modal"><h3>Novo usuário</h3>
     <div class="fg"><label class="fl">Nome completo</label><input class="fi" type="text" id="nu-nome"></div>
-    <div class="fg"><label class="fl">Telefone</label><input class="fi" type="text" id="nu-tel" inputmode="tel"></div>
+    <div class="fg"><label class="fl">Telefone</label><input class="fi" type="tel" id="nu-tel" inputmode="numeric" pattern="[0-9\s\(\)\-]*" placeholder="(11) 99999-9999"></div>
     <div class="fg"><label class="fl">E-mail (login)</label><input class="fi" type="email" id="nu-email"></div>
     <div class="fg"><label class="fl">Senha inicial</label><input class="fi" type="text" id="nu-senha" placeholder="Mínimo 6 caracteres"></div>
     <div class="fg"><label class="fl">Perfil</label>
@@ -1038,7 +1038,7 @@ body {
   <div class="modal"><h3>Editar usuário</h3>
     <input type="hidden" id="eu-id"><input type="hidden" id="eu-vid">
     <div class="fg"><label class="fl">Nome</label><input class="fi" type="text" id="eu-nome"></div>
-    <div class="fg"><label class="fl">Telefone</label><input class="fi" type="text" id="eu-tel"></div>
+    <div class="fg"><label class="fl">Telefone</label><input class="fi" type="tel" id="eu-tel" inputmode="numeric" pattern="[0-9\s\(\)\-]*" placeholder="(11) 99999-9999"></div>
     <div class="fg"><label class="fl">E-mail</label><input class="fi" type="email" id="eu-email"></div>
     <div class="fg"><label class="fl">Nova senha (deixe em branco para não alterar)</label><input class="fi" type="text" id="eu-senha" placeholder="Mínimo 6 caracteres"></div>
     <div class="fg"><label class="fl">Perfil</label>
@@ -1157,7 +1157,9 @@ async function loadVS(){
   renderAll();
 }
 async function loadHS(){
-  const {data}=await db.from('historico').select('*').order('created_at',{ascending:false}).limit(100);
+  const {data}=await db.from('historico').select('*')
+    .not('criterio','ilike','Transferência%')
+    .order('created_at',{ascending:false}).limit(100);
   HS=data||[];
 }
 async function loadUSERS(){
@@ -1366,15 +1368,18 @@ async function excluirHist(id,nome){
 }
 
 /* ══ TRANSFERIR ATENDIMENTO ═══════════════════════════════ */
+let TR_VEND_ORIGEM=null;
+
 function openModalTransferir(histId, vendOrigemId, clienteNome, vendOrigemNome){
-  // Próximo da fila excluindo o vendedor atual
   const proximo=calcFila().find(v=>v.id!==vendOrigemId);
   if(!proximo){toast('Nenhum vendedor disponível na fila para transferir','t-a');return;}
-
+  // Captura snapshot do vendedor origem agora
+  TR_VEND_ORIGEM=Object.assign({},VS.find(v=>v.id===vendOrigemId));
+  if(!TR_VEND_ORIGEM){toast('Vendedor não encontrado','t-r');return;}
   document.getElementById('tr-hist-id').value=histId;
   document.getElementById('tr-vend-origem-id').value=vendOrigemId;
   document.getElementById('tr-info').textContent=
-    clienteNome+' está com '+vendOrigemNome+'. Será transferido para: '+proximo.nome+' ('+proximo.atend_hoje+' atend. hoje)';
+    clienteNome+' está com '+vendOrigemNome+'.\nSerá transferido para: '+proximo.nome+' ('+proximo.atend_hoje+' atend. hoje)';
   document.getElementById('tr-prox-id').value=proximo.id;
   document.getElementById('tr-prox-nome').value=proximo.nome;
   openM('m-transferir');
@@ -1382,45 +1387,41 @@ function openModalTransferir(histId, vendOrigemId, clienteNome, vendOrigemNome){
 
 async function confirmarTransferir(){
   const histId=parseInt(document.getElementById('tr-hist-id').value);
-  const vendOrigemId=parseInt(document.getElementById('tr-vend-origem-id').value);
   const vendDestinoId=parseInt(document.getElementById('tr-prox-id').value);
+  const vOrigem=TR_VEND_ORIGEM; // snapshot capturado no clique
   const vDestino=VS.find(v=>v.id===vendDestinoId);
-  const vOrigem=VS.find(v=>v.id===vendOrigemId);
-  if(!vDestino||!vOrigem)return;
+  if(!vDestino||!vOrigem){toast('Erro — dados inválidos','t-r');return;}
   const agora=new Date().toISOString();
 
-  // Buscar dados do histórico original
   const {data:hist}=await db.from('historico').select('*').eq('id',histId).single();
+  if(!hist){toast('Atendimento não encontrado','t-r');return;}
 
   // Encerrar atendimento original
   await db.from('historico').update({encerrado:true}).eq('id',histId);
-  await db.from('clientes').update({encerrado:true}).eq('vendedor_id',vendOrigemId).eq('encerrado',false);
+  await db.from('clientes').update({encerrado:true}).eq('vendedor_id',vOrigem.id).eq('encerrado',false);
 
-  // Vendedor origem: volta para a fila na posição correta
-  // Pega o ultimo_atend mais antigo entre os disponíveis para colocar antes deles
-  const disponiveis=VS.filter(v=>v.status==='disponivel'&&v.id!==vendOrigemId);
-  let ultimoAtendAnterior;
+  // Colocar vendedor origem na frente da fila com dados originais preservados
+  const disponiveis=VS.filter(v=>v.status==='disponivel'&&v.id!==vOrigem.id);
+  let ultimoAtendAnterior=new Date('2000-01-01').toISOString();
   if(disponiveis.length>0){
-    // Pega o timestamp mais antigo e subtrai 1 segundo para ficar na frente
     const maisAntigo=disponiveis.reduce((min,v)=>new Date(v.ultimo_atend)<new Date(min.ultimo_atend)?v:min);
     ultimoAtendAnterior=new Date(new Date(maisAntigo.ultimo_atend).getTime()-1000).toISOString();
-  }else{
-    ultimoAtendAnterior=new Date('2000-01-01').toISOString();
   }
 
   await db.from('vendedores').update({
     status:'disponivel',
     entrou_as:vOrigem.entrou_as,
-    atend_hoje:Math.max(0,(vOrigem.atend_hoje||1)-1),
+    atend_hoje:Math.max(0,(vOrigem.atend_hoje||1)-1), // snapshot preservado
     ultimo_atend:ultimoAtendAnterior
-  }).eq('id',vendOrigemId);
+  }).eq('id',vOrigem.id);
 
-  // Vendedor destino: atendendo +1
+  // Vendedor destino: +1 atendimento
   await db.from('vendedores').update({
-    status:'atendendo',ultimo_atend:agora,atend_hoje:vDestino.atend_hoje+1
+    status:'atendendo',
+    ultimo_atend:agora,
+    atend_hoje:vDestino.atend_hoje+1
   }).eq('id',vendDestinoId);
 
-  // Registrar novo atendimento
   await db.from('clientes').insert({
     nome:hist.cliente_nome,tel:'',interesse:hist.interesse,
     vendedor_id:vendDestinoId,vendedor_nome:vDestino.nome,
@@ -1432,8 +1433,12 @@ async function confirmarTransferir(){
     vendedor_id:vendDestinoId,encerrado:false,vendido:false
   });
 
+  TR_VEND_ORIGEM=null;
   toast(hist.cliente_nome+' transferido para '+vDestino.nome,'t-g');
-  toast(vOrigem.nome+' voltou à fila com -1 atendimento','t-a');
+  toast(vOrigem.nome+' voltou à fila','t-a');
+  closeM('m-transferir');
+  await loadVS();await loadHS();
+}
   closeM('m-transferir');
   await loadVS();await loadHS();
 }
@@ -1459,7 +1464,11 @@ async function gerarRel(){
   const fim=document.getElementById('rel-fim').value;
   const vend=document.getElementById('rel-vend').value;
   if(!ini||!fim){toast('Selecione o período','t-r');return;}
-  let q=db.from('historico').select('*').gte('created_at',ini+'T00:00:00').lte('created_at',fim+'T23:59:59').order('created_at',{ascending:false});
+  let q=db.from('historico').select('*')
+    .gte('created_at',ini+'T00:00:00')
+    .lte('created_at',fim+'T23:59:59')
+    .not('criterio','ilike','Transferência%') // exclui registros de transferência
+    .order('created_at',{ascending:false});
   if(vend)q=q.eq('vendedor_nome',vend);
   const {data}=await q;const regs=data||[];
   if(!regs.length){document.getElementById('rel-result').innerHTML='<div class="empty">Nenhum atendimento no período</div>';return;}

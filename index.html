@@ -1429,68 +1429,6 @@ async function confirmarTransferir(){
   await loadVS();await loadHS();
 }
 
-async function confirmarTransferir(){
-  const histId=parseInt(document.getElementById('tr-hist-id').value);
-  const vendOrigemId=parseInt(document.getElementById('tr-vend-origem-id').value);
-  const vendDestinoId=parseInt(document.getElementById('tr-vend-dest').value);
-  const vDestino=VS.find(v=>v.id===vendDestinoId);
-  const vOrigem=VS.find(v=>v.id===vendOrigemId);
-  if(!vDestino||!vOrigem)return;
-  const agora=new Date().toISOString();
-
-  // Buscar dados do histórico original
-  const {data:hist}=await db.from('historico').select('*').eq('id',histId).single();
-
-  // Encerrar atendimento original
-  await db.from('historico').update({encerrado:true}).eq('id',histId);
-  await db.from('clientes').update({encerrado:true}).eq('vendedor_id',vendOrigemId).eq('encerrado',false);
-
-  // Vendedor origem: volta para a fila com -1 atendimento e timestamp anterior ao cliente
-  // Buscar o atendimento anterior ao atual para restaurar o ultimo_atend
-  const {data:histAnterior}=await db.from('historico')
-    .select('created_at')
-    .eq('vendedor_id',vendOrigemId)
-    .eq('encerrado',true)
-    .order('created_at',{ascending:false})
-    .limit(1)
-    .maybeSingle();
-
-  const ultimoAtendAnterior=histAnterior?.created_at||new Date('2000-01-01').toISOString();
-  const atendHojeOrigem=Math.max(0,(vOrigem.atend_hoje||1)-1);
-
-  await db.from('vendedores').update({
-    status:'disponivel',
-    entrou_as:agora,
-    atend_hoje:atendHojeOrigem,
-    ultimo_atend:ultimoAtendAnterior
-  }).eq('id',vendOrigemId);
-
-  // Vendedor destino: atendendo +1
-  await db.from('vendedores').update({
-    status:'atendendo',
-    ultimo_atend:agora,
-    atend_hoje:vDestino.atend_hoje+1
-  }).eq('id',vendDestinoId);
-
-  // Criar novo atendimento para o destino
-  await db.from('clientes').insert({
-    nome:hist.cliente_nome,tel:'',interesse:hist.interesse,
-    vendedor_id:vendDestinoId,vendedor_nome:vDestino.nome,
-    criterio:'Transferência de '+vOrigem.nome,
-    encerrado:false,vendido:false
-  });
-  await db.from('historico').insert({
-    cliente_nome:hist.cliente_nome,interesse:hist.interesse,
-    vendedor_nome:vDestino.nome,
-    criterio:'Transferência de '+vOrigem.nome,
-    vendedor_id:vendDestinoId,
-    encerrado:false,vendido:false
-  });
-
-  toast('Transferido para '+vDestino.nome+' · '+vOrigem.nome+' voltou à fila','t-g');
-  closeM('m-transferir');
-  await loadVS();await loadHS();
-}
 
 
 async function trocarSenha(){

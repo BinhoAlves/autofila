@@ -1461,7 +1461,8 @@ async function gerarRel(){
   let q=db.from('historico').select('*')
     .gte('created_at',ini+'T00:00:00')
     .lte('created_at',fim+'T23:59:59')
-    .not('criterio','ilike','Transferência%') // exclui registros de transferência
+    .eq('encerrado',true) // só atendimentos concluídos
+    .not('criterio','ilike','Transferência%') // exclui transferências
     .order('created_at',{ascending:false});
   if(vend)q=q.eq('vendedor_nome',vend);
   const {data}=await q;const regs=data||[];

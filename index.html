@@ -1104,7 +1104,7 @@ function ago(d){
 async function resetDiario(){
   const hoje=new Date().toDateString();
   if(localStorage.getItem('af_reset')!==hoje){
-    await db.from('vendedores').update({atend_hoje:0}).eq('ativo',true);
+    await db.from('vendedores').update({atend_hoje:0,vendas_hoje:0}).eq('ativo',true);
     await db.from('historico').update({encerrado:true}).eq('encerrado',false);
     localStorage.setItem('af_reset',hoje);
   }
@@ -1218,7 +1218,7 @@ async function setStatus(ns){
   toast('Status → '+SL[ns],'t-g');
   await loadVS();await loadHS();
   MEU_VEND=VS.find(v=>v.id===MEU_VEND.id)||null;
-  renderVendedor();
+  await renderVendedor();
 }
 
 async function marcarVendido(hid){
@@ -1230,7 +1230,7 @@ async function marcarVendido(hid){
   toast('Venda registrada! 🎉','t-g');
   await loadVS();await loadHS();
   MEU_VEND=VS.find(v=>v.id===MEU_VEND.id)||null;
-  renderVendedor();
+  await renderVendedor();
 }
 
 /* ══ CRIAR USUÁRIO ════════════════════════════════════════ */
@@ -1310,7 +1310,12 @@ async function excluirUser(id,nome){
     try{
       const {data:p}=await db.from('perfis').select('*').eq('id',id).single();
       if(p?.vendedor_id){
+        const {data:vnd}=await db.from('vendedores').select('nome').eq('id',p.vendedor_id).maybeSingle();
         await db.from('historico').delete().eq('vendedor_id',p.vendedor_id);
+        if(vnd?.nome){
+          await db.from('historico').delete().eq('vendedor_nome',vnd.nome);
+          await db.from('clientes').delete().eq('vendedor_nome',vnd.nome);
+        }
         await db.from('clientes').delete().eq('vendedor_id',p.vendedor_id);
         await db.from('vendedores').update({ativo:false}).eq('id',p.vendedor_id);
       }
@@ -1324,7 +1329,9 @@ async function excluirVend(id,nome){
   confirmarExcluir('Remover "'+nome+'" da equipe? O histórico e login serão apagados.',async()=>{
     const {data:p}=await db.from('perfis').select('id').eq('vendedor_id',id).maybeSingle();
     await db.from('historico').delete().eq('vendedor_id',id);
+    await db.from('historico').delete().eq('vendedor_nome',nome);
     await db.from('clientes').delete().eq('vendedor_id',id);
+    await db.from('clientes').delete().eq('vendedor_nome',nome);
     await db.from('vendedores').update({ativo:false}).eq('id',id);
     if(p){
       await db.from('perfis').delete().eq('id',p.id);
@@ -1620,7 +1627,7 @@ async function iniciar(){
   tabs.querySelector('.nav-btn')?.click();
   if(EU.perfil==='vendedor'&&EU.vendedor_id){
     MEU_VEND=VS.find(v=>v.id===Number(EU.vendedor_id))||null;
-    renderVendedor();
+    await renderVendedor();
   }
 }
 
@@ -1678,7 +1685,8 @@ setInterval(async()=>{
   if(!EU)return;
   await loadVS();await loadHS();
   if(EU.perfil==='vendedor'&&EU.vendedor_id){
-    MEU_VEND=VS.find(v=>v.id===Number(EU.vendedor_id))||null;renderVendedor();
+    MEU_VEND=VS.find(v=>v.id===Number(EU.vendedor_id))||null;
+    await renderVendedor();
   }
 },15000);
 

@@ -1069,7 +1069,23 @@ body {
   </div>
 </div>
 
-<div class="mwrap" id="m-transferir">
+<div class="mwrap" id="m-status-simples">
+  <div class="modal" style="max-width:340px"><h3 id="mss-titulo">Alterar status</h3>
+    <div class="fg">
+      <label class="fl">Novo status</label>
+      <select class="fs" id="mss-st">
+        <option value="disponivel">✅ Disponível</option>
+        <option value="atendendo">🟡 Atendendo</option>
+        <option value="indisponivel">⛔ Indisponível</option>
+        <option value="ferias">🏖️ Férias / Afastado</option>
+      </select>
+    </div>
+    <div class="mfoot">
+      <button class="btn" onclick="closeM('m-status-simples')">Cancelar</button>
+      <button class="btn btn-p" onclick="confirmarStatusSimples()">Confirmar</button>
+    </div>
+  </div>
+</div>
   <div class="modal"><h3>Transferir atendimento</h3>
     <input type="hidden" id="tr-hist-id">
     <input type="hidden" id="tr-vend-origem-id">
@@ -1575,7 +1591,7 @@ function renderVend(){
       <td style="font-weight:700;font-family:'JetBrains Mono',monospace">${v.atend_hoje}</td>
       <td style="font-weight:700;font-family:'JetBrains Mono',monospace">${v.atend_hoje+(v.virtual||0)}</td>
       <td><div style="display:flex;gap:6px">
-        <button class="btn btn-sm" onclick="openModalStatus(${v.id})">Status</button>
+        <button class="btn btn-sm" onclick="openModalStatusSimples(${v.id},'${v.nome.replace(/'/g,"\\'")}','${v.status}')">Status</button>
         ${EU?.perfil==='admin'?`<button class="btn btn-sm btn-d" onclick="excluirVend(${v.id},'${v.nome.replace(/'/g,"\\'")}')">Remover</button>`:''}
       </div></td>
     </tr>`;
@@ -1758,7 +1774,35 @@ function addTab(l,p){
 }
 
 /* ══ MODAIS ═══════════════════════════════════════════════ */
-let MS_VEND_ID=null;
+let MSS_ID=null;
+function openModalStatusSimples(id,nome,statusAtual){
+  MSS_ID=id;
+  document.getElementById('mss-titulo').textContent='Status — '+nome;
+  document.getElementById('mss-st').value=statusAtual;
+  openM('m-status-simples');
+}
+async function confirmarStatusSimples(){
+  const id=MSS_ID;
+  const ns=document.getElementById('mss-st').value;
+  const v=VS.find(x=>x.id===id);if(!v)return;
+  const up={status:ns};
+  if(ns==='disponivel'||ns==='indisponivel'){
+    if(ns==='disponivel')up.entrou_as=new Date().toISOString();
+    await db.from('historico').update({encerrado:true}).eq('vendedor_id',id).eq('encerrado',false);
+    await db.from('clientes').update({encerrado:true}).eq('vendedor_id',id).eq('encerrado',false);
+  }
+  if(v.status==='ferias'&&ns==='disponivel'){
+    up.virtual=calcVirtual(id);
+    toast(v.nome+' voltou — +'+up.virtual+' virtuais','t-p');
+  }
+  await db.from('vendedores').update(up).eq('id',id);
+  try{await db.from('log_status').insert({vendedor_id:id,vendedor_nome:v.nome,status_anterior:v.status,status_novo:ns,alterado_por:EU.email});}catch(e){}
+  toast('Status de '+v.nome+' → '+SL[ns],'t-a');
+  closeM('m-status-simples');
+  await loadVS();await loadHS();
+}
+
+
 
 function openModalStatus(id){
   MS_VEND_ID=id||null;

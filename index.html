@@ -1010,14 +1010,24 @@ body {
 <!-- ══ MODAIS ══════════════════════════════════════════════════ -->
 <div class="mwrap" id="m-status">
   <div class="modal"><h3>Alterar status</h3>
-    <div class="fg"><label class="fl">Vendedor</label><select class="fs" id="ms-vend"></select></div>
-    <div class="fg"><label class="fl">Novo status</label>
+    <div class="fg">
+      <label class="fl">Buscar vendedor</label>
+      <input class="fi" type="text" id="ms-busca" placeholder="Digite o nome..." oninput="filtrarVendedoresStatus()" autocomplete="off">
+    </div>
+    <div id="ms-lista" style="max-height:280px;overflow-y:auto;border:1px solid var(--c-border);border-radius:var(--r-md);margin-bottom:14px"></div>
+    <div class="fg" id="ms-status-wrap" style="display:none">
+      <label class="fl">Novo status para <span id="ms-vend-nome" style="color:var(--c-blue)"></span></label>
       <select class="fs" id="ms-st">
-        <option value="disponivel">Disponível</option><option value="atendendo">Atendendo</option>
-        <option value="indisponivel">Indisponível</option><option value="ferias">Férias / Afastado</option>
+        <option value="disponivel">✅ Disponível</option>
+        <option value="atendendo">🟡 Atendendo</option>
+        <option value="indisponivel">⛔ Indisponível</option>
+        <option value="ferias">🏖️ Férias / Afastado</option>
       </select>
     </div>
-    <div class="mfoot"><button class="btn" onclick="closeM('m-status')">Cancelar</button><button class="btn btn-p" onclick="confirmarStatus()">Confirmar</button></div>
+    <div class="mfoot">
+      <button class="btn" onclick="closeM('m-status')">Cancelar</button>
+      <button class="btn btn-p" id="ms-btn-confirmar" style="display:none" onclick="confirmarStatus()">Confirmar</button>
+    </div>
   </div>
 </div>
 
@@ -1127,9 +1137,15 @@ function ago(d){
 /* ══ FILA ══════════════════════════════════════════════════ */
 function calcFila(){
   return VS.filter(v=>v.status==='disponivel'&&v.ativo).sort((a,b)=>{
-    const d=new Date(a.ultimo_atend)-new Date(b.ultimo_atend);if(d!==0)return d;
-    const ta=a.atend_hoje+(a.virtual||0),tb=b.atend_hoje+(b.virtual||0);if(ta!==tb)return ta-tb;
-    return new Date(a.entrou_as)-new Date(b.entrou_as);
+    // Critério 1 — dia mais antigo primeiro (só compara a data, ignora horário)
+    const dA=new Date(a.ultimo_atend).toDateString();
+    const dB=new Date(b.ultimo_atend).toDateString();
+    if(dA!==dB)return new Date(a.ultimo_atend)-new Date(b.ultimo_atend);
+    // Critério 2 — mesmo dia: menos atendimentos primeiro
+    const ta=a.atend_hoje+(a.virtual||0),tb=b.atend_hoje+(b.virtual||0);
+    if(ta!==tb)return ta-tb;
+    // Critério 3 — mesmo dia e mesma quantidade: horário mais antigo primeiro
+    return new Date(a.ultimo_atend)-new Date(b.ultimo_atend);
   });
 }
 function critUsado(v,r,ord){
@@ -1202,7 +1218,7 @@ async function registrar(){
 
 /* ══ STATUS ════════════════════════════════════════════════ */
 async function confirmarStatus(){
-  const id=parseInt(document.getElementById('ms-vend').value);
+  const id=MS_VEND_ID;
   const ns=document.getElementById('ms-st').value;
   const v=VS.find(x=>x.id===id);if(!v)return;
   const up={status:ns};
@@ -1553,7 +1569,7 @@ function renderVend(){
     return `<tr class="${r===0?'hl':''}">
       <td>${v.status==='disponivel'?`<div class="pos-badge ${r===0?'p1':r===1?'p2':r===2?'p3':'pN'}">${r+1}º</div>`:'<div class="pos-badge pN">—</div>'}</td>
       <td><div style="display:flex;align-items:center;gap:10px"><div class="av ${av(v.id)}">${ini(v.nome)}</div>
-        <div><div style="font-size:13px;font-weight:600">${v.nome}</div><div class="txt2">${v.email||''}</div></div></div></td>
+        <div><div style="font-size:13px;font-weight:600">${v.nome}</div>${EU?.perfil==='admin'?`<div class="txt2">${v.email||''}</div>`:''}</div></div></td>
       <td><span class="badge ${SB[v.status]}"><span class="bdot"></span>${SL[v.status]}</span></td>
       <td class="txt2 mono">${ago(v.ultimo_atend)}</td>
       <td style="font-weight:700;font-family:'JetBrains Mono',monospace">${v.atend_hoje}</td>
@@ -1742,9 +1758,47 @@ function addTab(l,p){
 }
 
 /* ══ MODAIS ═══════════════════════════════════════════════ */
+let MS_VEND_ID=null;
+
 function openModalStatus(id){
-  document.getElementById('ms-vend').innerHTML=VS.map(v=>`<option value="${v.id}" ${v.id===id?'selected':''}>${v.nome} — ${SL[v.status]}</option>`).join('');
+  MS_VEND_ID=id||null;
+  document.getElementById('ms-busca').value='';
+  document.getElementById('ms-status-wrap').style.display='none';
+  document.getElementById('ms-btn-confirmar').style.display='none';
+  filtrarVendedoresStatus();
+  // Se veio com id pré-selecionado, seleciona automaticamente
+  if(id){
+    const v=VS.find(x=>x.id===id);
+    if(v)selecionarVendedorStatus(id,v.nome,v.status);
+  }
   openM('m-status');
+  setTimeout(()=>document.getElementById('ms-busca').focus(),100);
+}
+
+function filtrarVendedoresStatus(){
+  const busca=document.getElementById('ms-busca').value.toLowerCase();
+  const lista=VS.filter(v=>v.nome.toLowerCase().includes(busca));
+  const SBg={disponivel:'#10b981',atendendo:'#f59e0b',indisponivel:'#6b7280',ferias:'#ef4444'};
+  document.getElementById('ms-lista').innerHTML=!lista.length
+    ?'<div class="empty">Nenhum vendedor encontrado</div>'
+    :lista.map(v=>`
+      <div onclick="selecionarVendedorStatus(${v.id},'${v.nome.replace(/'/g,"\\'")}','${v.status}')"
+        style="display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--c-border);transition:background .1s;${MS_VEND_ID===v.id?'background:var(--c-blue-bg)':''}"
+        onmouseover="this.style.background='rgba(255,255,255,0.04)'" 
+        onmouseout="this.style.background='${MS_VEND_ID===v.id?'var(--c-blue-bg)':'transparent'}'">
+        <div class="av ${av(VS.indexOf(v))}" style="width:32px;height:32px;font-size:11px">${ini(v.nome)}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500">${v.nome}</div></div>
+        <span style="font-size:11px;padding:3px 8px;border-radius:12px;background:${SBg[v.status]}22;color:${SBg[v.status]};font-weight:600">${SL[v.status]}</span>
+      </div>`).join('');
+}
+
+function selecionarVendedorStatus(id, nome, statusAtual){
+  MS_VEND_ID=id;
+  document.getElementById('ms-vend-nome').textContent=nome;
+  document.getElementById('ms-st').value=statusAtual;
+  document.getElementById('ms-status-wrap').style.display='block';
+  document.getElementById('ms-btn-confirmar').style.display='inline-flex';
+  filtrarVendedoresStatus(); // atualiza highlight
 }
 function toggleAviso(){
   document.getElementById('nu-aviso').style.display=document.getElementById('nu-perfil').value==='vendedor'?'block':'none';
